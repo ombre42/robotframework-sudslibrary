@@ -5,6 +5,7 @@
 MANIFEST
 *.egg-info
 *.egg
+doc/*.html
 
 dist
 build

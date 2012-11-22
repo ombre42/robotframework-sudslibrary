@@ -38,13 +38,6 @@ def to_bool(item):
 
 class _Options(object):
 
-    def get_option(self, option):
-        """Gets the value of the specified client option.
-        
-        see [http://jortel.fedorapeople.org/suds/doc/suds.options.Options-class.html|the Suds documentation]
-        """
-        return getattr(self._client().options, option)
-
     def set_service(self, service):
         """Use the given `service` in future calls.
         
