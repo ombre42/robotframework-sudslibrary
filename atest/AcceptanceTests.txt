@@ -198,6 +198,11 @@
 |    | ${first name} | Get Wsdl Object Attribute | ${person} | first-name |
 |    | Should Be Equal As Strings | ${first name} | Bob |
 
+| sd |
+|    | Create Client | ${TEST WSDL URL} |
+|    | Set Proxies | http | localhost:5000 |
+|    | ${fault} | Call Soap Method | theAnswer |
+
 | *** Keywords *** |
 | Wrapper around builtin kw with a DSL like name |
 |    | [Arguments] | @{varargs} |
