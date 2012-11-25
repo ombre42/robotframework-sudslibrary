@@ -90,16 +90,6 @@ class _OptionsKeywords(object):
         """
         self._set_boolean_option('retxml', return_xml)
 
-    def set_xstq(self, xstq):
-        """Set the XML schema type qualified flag.
-
-        The XML schema type qualified flag indicates that _xsi:type_ attribute 
-        *values* should be qualified by namespace.
-
-        Default value is _True_.
-        """
-        self._set_boolean_option('xstq', xstq)
-
     def set_autoblend(self, autoblend):
         """Set the autoblend flag.
 
