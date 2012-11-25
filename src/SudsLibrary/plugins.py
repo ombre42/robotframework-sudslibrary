@@ -14,7 +14,6 @@
 
 from suds.plugin import MessagePlugin
 from robot.api import logger
-from .monkeypatches import *
 
 
 class _SudsListener(MessagePlugin):
