@@ -35,7 +35,7 @@ class _ClientManagementKeywords(object):
         | Create Client | http://localhost:8080/ws/Billing.asmx?WSDL |
         | Create Client | ${CURDIR}/../wsdls/tracking.wsdl |
         """
-        self._url = self._get_url(url_or_path)
+        url = self._get_url(url_or_path)
         kwargs = {'plugins': (self._listener,)}
         imports = self._imports
         if imports:
@@ -43,9 +43,9 @@ class _ClientManagementKeywords(object):
             kwargs['doctor'] = ImportDoctor(*imports)
         #if 'credentials' in options:
         #    kwargs['transport'] = HttpAuthenticated(username=options['credentials']['username'], password=options['credentials']['password'])
-        client = Client(self._url, **kwargs)
+        client = Client(url, **kwargs)
         client.set_options(faults=True)
-        self._logger.info('Using WSDL at %s%s' % (self._url, client))
+        self._logger.info('Using WSDL at %s%s' % (url, client))
         self._imports = []
         return self._cache.register(client, alias)
 

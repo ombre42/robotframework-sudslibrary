@@ -36,7 +36,6 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     ROBOT_LIBRARY_DOC_FORMAT = "ROBOT"
 
     def __init__(self):
-        self._url = None
         self._cache = ConnectionCache(no_current_msg='No current client')
         self._imports = []
         self._listener = _SudsListener()
