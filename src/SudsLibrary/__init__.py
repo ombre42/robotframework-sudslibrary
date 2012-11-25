@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from os.path import abspath, dirname, join
 from robot.utils import ConnectionCache
 from .plugins import _SudsListener
 from .factory import _FactoryKeywords
@@ -20,11 +21,16 @@ from .options import _OptionsKeywords
 from .proxy import _ProxyKeywords
 from robot.api import logger
 
+THIS_DIR = dirname(abspath(__file__))
+execfile(join(THIS_DIR, 'version.py'))
+
+__version__ = VERSION
 
 class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords, 
                   _OptionsKeywords, _ProxyKeywords):
     """Library for functional testing of SOAP-based web services."""
 
+    ROBOT_LIBRARY_VERSION = VERSION
     ROBOT_LIBRARY_SCOPE = "TEST"
     ROBOT_LIBRARY_DOC_FORMAT = "ROBOT"
 

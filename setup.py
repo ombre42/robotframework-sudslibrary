@@ -8,7 +8,7 @@ from ez_setup import use_setuptools
 use_setuptools()
 from setuptools import setup
 
-VERSION = '0.1'
+execfile(join(dirname(__file__), 'src', 'SudsLibrary', 'version.py'))
 
 DESCRIPTION = """
 SudsLibrary is a web service testing library for Robot Framework
