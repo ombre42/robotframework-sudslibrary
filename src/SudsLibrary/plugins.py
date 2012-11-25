@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import xml.dom.minidom
 from suds.plugin import MessagePlugin
 from robot.api import logger
 
