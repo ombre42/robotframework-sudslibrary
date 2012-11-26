@@ -41,8 +41,6 @@ class _ClientManagementKeywords(object):
         if imports:
             self._log_imports()
             kwargs['doctor'] = ImportDoctor(*imports)
-        #if 'credentials' in options:
-        #    kwargs['transport'] = HttpAuthenticated(username=options['credentials']['username'], password=options['credentials']['password'])
         client = Client(url, **kwargs)
         client.set_options(faults=True)
         self._logger.info('Using WSDL at %s%s' % (url, client))

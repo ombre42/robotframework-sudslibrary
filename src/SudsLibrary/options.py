@@ -14,6 +14,9 @@
 
 from suds.xsd.doctor import Import
 from suds.xsd.sxbasic import Import as BasicImport
+from suds.transport.https import HttpAuthenticated
+from suds.transport.https import WindowsHttpAuthenticated
+from suds.transport.http import HttpAuthenticated as AlwaysSendTransport
 from .utils import *
 
 
@@ -99,6 +102,28 @@ class _OptionsKeywords(object):
         Default value is _False_.
         """
         self._set_boolean_option('autoblend', autoblend)
+
+    def set_http_authentication(self, username, password, type='STANDARD'):
+        """Enables http authentication.
+        
+        Available types are STANDARD, ALWAYS_SEND, and NTLM. Type STANDARD 
+        will only send credentials to the server upon request (HTTP/1.0 401 
+        Authorization Required) by the server only. Type ALWAYS_SEND will 
+        cause an Authorization header to be sent in every request. Type NTLM 
+        requires the python-ntlm package to be installed, which is not 
+        packaged with Suds or SudsLibrary.
+        """
+        classes = {
+            'STANDARD': HttpAuthenticated,
+            'ALWAYS_SEND': AlwaysSendTransport,
+            'NTLM': WindowsHttpAuthenticated
+        }
+        try:
+            _class = classes[type.upper()]
+        except KeyError:
+            raise ValueError("'%s' is not a supported type." % type)
+        transport = _class(username=username, password=password)
+        self._client().set_options(transport=transport)
 
     def set_location(self, url, service_index=-1, *names):
         """Set location to use in future calls.
