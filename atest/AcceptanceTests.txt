@@ -199,7 +199,6 @@
 |    | Should Be Equal As Strings | ${first name} | Bob |
 
 | Http Authentication |
-|    | Comment | Create Client | ${CURDIR}/wsdls/Calculator.wsdl | http_username=bob | http_password=foo |
 |    | Create Client | ${CURDIR}/wsdls/Calculator.wsdl |
 |    | Set Http Authentication | bob | foo | STANDARD |
 |    | ${sum} | Call Soap Method | add | 1 | 41 |
@@ -212,13 +211,5 @@
 |    | Run Keyword And Expect Error | ValueError: 'bad' is not a supported type. | Set Http Authentication | bob | foo | bad |
 
 | *** Keywords *** |
-| Wrapper around builtin kw with a DSL like name |
-|    | [Arguments] | @{varargs} |
-|    | ${list} | Create List |
-|    | : FOR | ${item} | IN | @{varargs} |
-|    |    | Log | ${item} |
-|    |    | Append To List | ${list} | ${item} |
-|    | [Return] | ${list} |
-
 | Create Client With Bad Locations And Missing Schema |
 |    | SudsLibrary.Create Client | ../../Statistics.wsdl |
