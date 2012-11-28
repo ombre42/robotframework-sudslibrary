@@ -18,11 +18,12 @@ from suds.xsd.doctor import ImportDoctor
 from suds.transport.http import HttpAuthenticated
 from urlparse import urlparse
 from suds.client import Client
+from .utils import *
 
 
 class _ClientManagementKeywords(object):
 
-    def create_client(self, url_or_path, alias=None):
+    def create_client(self, url_or_path, alias=None, autoblend=False):
         """Loads the WSDL from the given URL or path and creates a Suds client.
 
         Returns the index of this client instance which can be used later to
@@ -31,12 +32,16 @@ class _ClientManagementKeywords(object):
         Optional alias is an alias for the client instance and it can be used
         for switching between clients (just as index can be used). See `Switch
         Client` for more details.
+        
+        Autoblend ensures that the schema(s) defined within the WSDL import 
+        each other.
 
         | Create Client | http://localhost:8080/ws/Billing.asmx?WSDL |
         | Create Client | ${CURDIR}/../wsdls/tracking.wsdl |
         """
         url = self._get_url(url_or_path)
-        kwargs = {'plugins': (self._listener,)}
+        autoblend = to_bool(autoblend)
+        kwargs = {'plugins': (self._listener,), 'autoblend': autoblend}
         imports = self._imports
         if imports:
             self._log_imports()

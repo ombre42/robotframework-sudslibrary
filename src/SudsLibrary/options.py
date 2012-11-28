@@ -93,16 +93,6 @@ class _OptionsKeywords(object):
         """
         self._set_boolean_option('retxml', return_xml)
 
-    def set_autoblend(self, autoblend):
-        """Set the autoblend flag.
-
-        The autoblend flag that ensures that the schema(s) defined within the 
-        WSDL import each other.
-
-        Default value is _False_.
-        """
-        self._set_boolean_option('autoblend', autoblend)
-
     def set_http_authentication(self, username, password, type='STANDARD'):
         """Enables http authentication.
         
