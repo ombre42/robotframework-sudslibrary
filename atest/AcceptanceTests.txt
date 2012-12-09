@@ -68,7 +68,6 @@
 |    | Should Be Equal As Strings | ${resp} | Phillip McCann |
 
 | Set Port |
-|    | Run Keyword And Expect Error | No client was created | Call Soap Method | Set Port | http://localhost:8080/TestService/soap11 |
 |    | Create Client | ${CURDIR}/wsdls/TestService_ports.wsdl |
 |    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
 |    | Set Port | TestService |
@@ -119,12 +118,12 @@
 |    | Element Text Should Be | ${first name elem} | John |
 
 | Two Clients By Index |
-|    | Create Client | ${CALCULATOR WSDL URL} |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Switch Client | 1 |
+|    | ${calc index} | Create Client | ${CALCULATOR WSDL URL} |
+|    | ${test index} | Create Client | ${TEST WSDL URL} |
+|    | Switch Client | ${calc index} |
 |    | ${sum} | Call Soap Method | add | 1 | 1 |
 |    | Should Be Equal As Numbers | ${sum} | 2 |
-|    | Switch Client | 2 |
+|    | Switch Client | ${test index} |
 |    | ${answer} | Call Soap Method | theAnswer |
 |    | Should Be Equal As Numbers | ${answer} | 42 |
 

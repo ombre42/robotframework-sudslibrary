@@ -32,7 +32,7 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     """Library for functional testing of SOAP-based web services."""
 
     ROBOT_LIBRARY_VERSION = VERSION
-    ROBOT_LIBRARY_SCOPE = "TEST"
+    ROBOT_LIBRARY_SCOPE = "GLOBAL"
     ROBOT_LIBRARY_DOC_FORMAT = "ROBOT"
 
     def __init__(self):
