@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from suds import WebFault
-from suds.sax.enc import Encoder
-from suds.sax.text import Raw
 from .utils import *
 
 
@@ -70,7 +68,6 @@ class _ProxyKeywords(object):
         method = getattr(client.service, name)
         self._listener.location = method.method.location
         retxml = client.options.retxml
-        args = [self._encode_if_necessary(arg) for arg in args]
         received =  None
         try:
             received = method(*args)
@@ -88,8 +85,3 @@ class _ProxyKeywords(object):
         finally:
             self._restore_options()
         return received
-
-    def _encode_if_necessary(self, arg):
-        if Encoder().needsEncoding(arg):
-            arg = Raw(arg)
-        return arg
