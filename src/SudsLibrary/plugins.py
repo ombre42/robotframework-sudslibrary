@@ -23,18 +23,22 @@ class _SudsListener(MessagePlugin):
         self._sent = None
         self._received = None
         self.location = 'UNKOWN'
+        self.log = True
 
     def sending(self, context):
         self._sent = context.envelope
         self._received = None
-        logger.info('Sending to %s:\n%s' % (self.location, self.last_sent(True)))
+        if self.log:
+            logger.info('Sending to %s:\n%s' % \
+                        (self.location, self.last_sent(True)))
 
     def last_sent(self, pretty=False):
         return self._prettyxml(self._sent) if pretty else self._sent
 
     def received(self, context):
         self._received = context.reply
-        logger.info('Received:\n%s' % self.last_received(True))
+        if self.log:
+            logger.info('Received:\n%s' % self.last_received(True))
 
     def last_received(self, pretty=False):
         return self._prettyxml(self._received) if pretty else self._received

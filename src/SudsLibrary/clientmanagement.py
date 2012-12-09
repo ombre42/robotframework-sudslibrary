@@ -50,6 +50,7 @@ class _ClientManagementKeywords(object):
         client.set_options(faults=True)
         self._logger.info('Using WSDL at %s%s' % (url, client))
         self._imports = []
+        self._logging_option[client] = True
         return self._cache.register(client, alias)
 
     def switch_client(self, index_or_alias):
@@ -74,7 +75,8 @@ class _ClientManagementKeywords(object):
         | # Do something ... |                |     |
         | Switch Client      | ${id}          |     |
         """
-        self._cache.switch(index_or_alias)
+        client = self._cache.switch(index_or_alias)
+        self._listener.log = self._logging_option[client]
 
     # private
 

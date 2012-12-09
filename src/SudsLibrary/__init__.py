@@ -40,3 +40,4 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
         self._imports = []
         self._listener = _SudsListener()
         self._logger = logger
+        self._logging_option = {}

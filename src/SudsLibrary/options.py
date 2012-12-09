@@ -163,6 +163,22 @@ class _OptionsKeywords(object):
         """
         BasicImport.bind(namespace, location)
 
+    def set_soap_logging(self, log):
+        """Sets whether to log the request and response for the current client.
+        
+        Logging is enabled by default. Disabling logging will reduce the size 
+        of the log. Returns the current value.
+        
+        Example:
+        | ${old log setting} | Set Soap Logging | True |
+        """
+        client = self._client()
+        old_value = self._logging_option[client]
+        new_value = to_bool(log)
+        self._logging_option[client] = new_value
+        self._listener.log = new_value
+        return old_value
+
     # private
 
     def _set_boolean_option(self, name, value):
