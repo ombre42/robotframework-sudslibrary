@@ -209,6 +209,22 @@
 |    | Should Be Equal As Strings | ${request.headers['Authorization']} | Basic Ym9iOmZvbw== |
 |    | Run Keyword And Expect Error | ValueError: 'bad' is not a supported type. | Set Http Authentication | bob | foo | bad |
 
+| Set Location |
+|    | Create Client | ${TEST WSDL URL} |
+|    | Set Location | http://localhost:8080/badpath |
+|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
+|    | Set Location | http://localhost:8080/TestService/soap11/ |
+|    | Call Soap Method | theAnswer |
+|    | Set Location | http://localhost:8080/badpath |    | complexTypeArgument |
+|    | ${dict} | Evaluate | {'first-name':'George','last-name':'Cooper'} |
+|    | Run Keyword And Expect Error | * | Call Soap Method | complexTypeArgument | ${dict} |
+|    | Call Soap Method | theAnswer |
+|    | Create Client | ${CURDIR}/wsdls/TestService_services.wsdl |
+|    | Set Location | http://localhost:8080/TestService/soap11/ | ALL_SERVICES | theAnswer |
+|    | Specific Soap Call | 0 |    | theAnswer |
+|    | Specific Soap Call | 1 |    | theAnswer |
+|    | Run Keyword And Expect Error | ServiceNotFound: Service not found: 'wohoo' | Set Location | http://localhost:8080/badpath | wohoo |
+
 | *** Keywords *** |
 | Create Client With Bad Locations And Missing Schema |
 |    | SudsLibrary.Create Client | ../../Statistics.wsdl |

@@ -14,6 +14,7 @@
 
 from suds.xsd.doctor import Import
 from suds.xsd.sxbasic import Import as BasicImport
+from suds import ServiceNotFound
 from suds.transport.https import HttpAuthenticated
 from suds.transport.https import WindowsHttpAuthenticated
 from suds.transport.http import HttpAuthenticated as AlwaysSendTransport
@@ -115,24 +116,31 @@ class _OptionsKeywords(object):
         transport = _class(username=username, password=password)
         self._client().set_options(transport=transport)
 
-    def set_location(self, url, service_index=-1, *names):
-        """Set location to use in future calls.
+    def set_location(self, url, service='ALL_SERVICES', *names):
+        """Sets location to use in future calls.
 
         This is for when the location(s) specified in the WSDL are not correct. 
-        `service` is the index of the service to alter locations for and not 
-        used if there is only one service defined. If `service` is less than 0, 
+        `service` is the name or index of the service to change and ignored 
+        unless there is more than one service. If `service` is ALL_SERVICES, 
         then set the location on all services. If no methods names are given, 
         then sets the location for all methods.
         """
         wsdl = self._client().wsdl
         service_count = len(wsdl.services)
-        service_index = 0 if (service_count==1) else int(service_index)
+        service = 0 if (service_count==1) else parse_index(service)
         names = names if names else None
-        if service_index < 0:
+        if service == 'ALL_SERVICES':
             for svc in wsdl.services:
                 svc.setlocation(url, names)
+        elif isinstance(service, int):
+            wsdl.services[service].setlocation(url, names)
         else:
-            wsdl.services[service_index].setlocation(url, names)
+            found = False
+            for svc in  wsdl.services:
+                if svc.name == service:
+                    svc.setlocation(url, names)
+                    return
+            raise ServiceNotFound, service
 
     def add_doctor_import(self, import_namespace, location=None, *filters):
         """Add an import be used in the next client.
