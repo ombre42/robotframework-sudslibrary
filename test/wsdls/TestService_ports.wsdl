@@ -1,0 +1,83 @@
+<wsdl:definitions name="TestService" targetNamespace="urn:TestService" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ns2="urn:TestService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="urn:TestService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <wsdl:types>
+      <xsd:schema targetNamespace="urn:TestService">
+         <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+         <xsd:complexType name="Person">
+            <xsd:sequence>
+               <xsd:element maxOccurs="1" minOccurs="1" name="first-name" type="xsd:string"/>
+               <xsd:element maxOccurs="1" minOccurs="1" name="last-name" type="xsd:string"/>
+            </xsd:sequence>
+         </xsd:complexType>
+      </xsd:schema>
+   </wsdl:types>
+   <wsdl:message name="complexTypeArgument">
+      <wsdl:part name="person" type="ns2:Person"/>
+   </wsdl:message>
+   <wsdl:message name="complexTypeArgumentResponse">
+      <wsdl:part name="result" type="xsd:string"/>
+   </wsdl:message>
+   <wsdl:message name="returnComplexType">
+      <wsdl:part name="first-name" type="xsd:string"/>
+      <wsdl:part name="last-name" type="xsd:string"/>
+   </wsdl:message>
+   <wsdl:message name="returnComplexTypeResponse">
+      <wsdl:part name="result" type="ns2:Person"/>
+   </wsdl:message>
+   <wsdl:message name="theAnswer"/>
+   <wsdl:message name="theAnswerResponse">
+      <wsdl:part name="result" type="xsd:long"/>
+   </wsdl:message>
+   <wsdl:portType name="TestServicePortType">
+      <wsdl:operation name="complexTypeArgument">
+         <wsdl:input message="tns:complexTypeArgument"/>
+         <wsdl:output message="tns:complexTypeArgumentResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="returnComplexType">
+         <wsdl:input message="tns:returnComplexType"/>
+         <wsdl:output message="tns:returnComplexTypeResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="theAnswer">
+         <wsdl:input message="tns:theAnswer"/>
+         <wsdl:output message="tns:theAnswerResponse"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="TestService" type="tns:TestServicePortType">
+      <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <wsdl:operation name="complexTypeArgument">
+         <soap:operation soapAction="http://localhost:8080/TestService/soap11/complexTypeArgument" style="rpc"/>
+         <wsdl:input>
+            <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:TestService" use="encoded"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:TestService" use="encoded"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="returnComplexType">
+         <soap:operation soapAction="http://localhost:8080/TestService/soap11/returnComplexType" style="rpc"/>
+         <wsdl:input>
+            <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:TestService" use="encoded"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:TestService" use="encoded"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="theAnswer">
+         <soap:operation soapAction="http://localhost:8080/TestService/soap11/theAnswer" style="rpc"/>
+         <wsdl:input>
+            <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:TestService" use="encoded"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:TestService" use="encoded"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="TestService">
+   <!-- first port is bad -->
+      <wsdl:port binding="tns:TestService" name="BadPort">
+         <soap:address location="http://localhost:8080/TestService2/soap11"/>
+      </wsdl:port>
+	  <wsdl:port binding="tns:TestService" name="TestService">
+         <soap:address location="http://localhost:8080/TestService/soap11"/>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>

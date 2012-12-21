@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://soapheaders/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://soapheaders/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://soapheaders/">
+      <s:element name="AuthHeader" type="tns:AuthHeader" />
+      <s:complexType name="AuthHeader">
+        <s:sequence>
+          <s:element name="UserName" type="s:string" />
+          <s:element name="Password" type="s:string" />
+        </s:sequence>
+        <s:anyAttribute />
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="DoItSoapIn" />
+  <wsdl:message name="DoItSoapOut" />
+  <wsdl:message name="DoItAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:portType name="soapheadersSoap">
+    <wsdl:operation name="DoIt">
+      <wsdl:input message="tns:DoItSoapIn" />
+      <wsdl:output message="tns:DoItSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="soapheadersSoap" type="tns:soapheadersSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="DoIt">
+      <soap:operation soapAction="http://soapheaders/DoIt" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:DoItAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="floristlinkapi">
+    <wsdl:port name="soapheadersSoap" binding="tns:soapheadersSoap">
+      <soap:address location="http://localhost:8080/badURL" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
