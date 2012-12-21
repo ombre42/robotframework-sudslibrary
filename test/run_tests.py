@@ -11,8 +11,8 @@ ROBOT_ARGS = [
     '--pythonpath', testenv.SRC_DIR,
 ]
 
-def acceptance_tests(interpreter, args):
-    runner = {'python': 'pybot', 'jython': 'jybot', 'ipy': 'ipybot'}[interpreter]
+def acceptance_tests(args):
+    runner = 'pybot'
     if os.sep == '\\':
         runner += '.bat'
     _make_results_dir()
@@ -25,9 +25,5 @@ def _make_results_dir():
         os.mkdir(testenv.RESULTS_DIR)
 
 if __name__ ==  '__main__':
-    if not len(sys.argv) > 1:
-        print "Usage: run_tests.py python|jython"
-        sys.exit(1)
-    interpreter = sys.argv[1]
-    args = sys.argv[2:]
-    acceptance_tests(interpreter, args)
+    args = sys.argv[1:]
+    acceptance_tests(args)
