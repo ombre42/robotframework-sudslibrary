@@ -19,7 +19,7 @@ from .utils import *
 class _ProxyKeywords(object):
 
     def call_soap_method(self, name, *args):
-        """Call the SOAP method with the given `name` and `args`.
+        """Calls the SOAP method with the given `name` and `args`.
 
         Returns a Python object graph or SOAP envelope as a XML string 
         depending on the client options.
@@ -42,7 +42,7 @@ class _ProxyKeywords(object):
         return self._call(service, port, False, name, *args)
 
     def call_soap_method_expecting_fault(self, name, *args):
-        """Call the SOAP method expecting the server to raise a fault.
+        """Calls the SOAP method expecting the server to raise a fault.
 
         Fails if the server does not raise a fault.  Returns a Python object 
         graph or SOAP envelope as a XML string depending on the client 

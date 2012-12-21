@@ -24,7 +24,7 @@ from .utils import *
 class _OptionsKeywords(object):
 
     def set_service(self, service):
-        """Use the given `service` in future calls.
+        """Sets the `service` to use in future requests.
 
         `service` should be the name or the index of the service as it appears in the WSDL.
         """
@@ -32,7 +32,7 @@ class _OptionsKeywords(object):
         self._client().set_options(service=service)
 
     def set_port(self, port):
-        """Use the given `port` in future calls.
+        """Sets the `port` to use in future requests.
 
         `port` should be the name or the index of the port as it appears in the WSDL.
         """
@@ -40,7 +40,7 @@ class _OptionsKeywords(object):
         self._client().set_options(port=port)
 
     def set_proxies(self, *protocol_url_pairs):
-        """Controls http proxy settings.
+        """Sets the http proxy settings.
 
         | Set Proxy | http | localhost:5000 | https | 10.0.4.23:80 |
         """
@@ -52,10 +52,11 @@ class _OptionsKeywords(object):
         self._client().set_options(proxy=proxy)
 
     def set_headers(self, *dict_or_key_value_pairs):
-        """Specify _extra_ http headers to send.
+        """Sets _extra_ http headers to send in future requests.
 
         Example:
         | Set Headers | X-Requested-With  | autogen          | # using key-value pairs |
+        or using a dictionary:
         | ${headers}= | Create Dictionary | X-Requested-With | autogen                 |
         | Set Headers | ${headers}        |                  | # using a dictionary    |
         """
@@ -71,31 +72,32 @@ class _OptionsKeywords(object):
         self._client().set_options(headers=headers)
 
     def set_soap_headers(self, *headers):
-        """Specify SOAP headers.
+        """Sets SOAP headers to send in future requests.
 
         Example:
-        | ${auth header}=           | Create Wsdl Object | AuthHeader           |          |          |       |
-        | Set Wsdl Object Attribute | ${auth header}     | UserName             | gcarlson |          |       |
-        | Set Wsdl Object Attribute | ${auth header}     | Password             | heyOh    |          |       |
-        | Set Soap Headers          | ${auth header}     | # using WSDL object  |          |          |       |
-        | ${auth dict}=             | Create Dictionary  | UserName             | sjenson  | Password | power |
-        | Set Soap Headers          | ${auth dict}       | # using a dictionary |          |          |       |
+        | ${auth header}=           | Create Wsdl Object | AuthHeader           |          |
+        | Set Wsdl Object Attribute | ${auth header}     | UserName             | gcarlson |
+        | Set Wsdl Object Attribute | ${auth header}     | Password             | heyOh    |
+        | Set Soap Headers          | ${auth header}     | # using WSDL object  |          |
+        or using a dictionary:
+        | ${auth dict}=             | Create Dictionary  | UserName             | gcarlson  | Password | heyOh |
+        | Set Soap Headers          | ${auth dict}       | # using a dictionary |           |          |       |
         """
         self._client().set_options(soapheaders=headers)
     
     def set_return_xml(self, return_xml):
-        """Set whether to return XML in future calls.
+        """Sets whether to return XML in future requests.
 
         The default value is _False_. If `return_xml` is True, then return the 
-        SOAP envelope as a string in future calls. Otherwise, return a Python 
-        object graph.
+        SOAP envelope as a string in future requests. Otherwise, return a 
+        Python object graph.
 
         See also `Call Soap Method`, `Call Soap Method Expecting Fault`, and `Specific Soap Call`.
         """
         self._set_boolean_option('retxml', return_xml)
 
     def set_http_authentication(self, username, password, type='STANDARD'):
-        """Enables http authentication.
+        """Sets http authentication type and credentials.
         
         Available types are STANDARD, ALWAYS_SEND, and NTLM. Type STANDARD 
         will only send credentials to the server upon request (HTTP/1.0 401 
@@ -117,7 +119,7 @@ class _OptionsKeywords(object):
         self._client().set_options(transport=transport)
 
     def set_location(self, url, service='ALL_SERVICES', *names):
-        """Sets location to use in future calls.
+        """Sets location to use in future requests.
 
         This is for when the location(s) specified in the WSDL are not correct. 
         `service` is the name or index of the service to change and ignored 
@@ -143,7 +145,7 @@ class _OptionsKeywords(object):
             raise ServiceNotFound, service
 
     def add_doctor_import(self, import_namespace, location=None, *filters):
-        """Add an import be used in the next client.
+        """Adds an import be used in the next client.
 
         Doctor imports are applied to the _next_ client created with 
         `Create Client`. Doctor imports are necessary when the references are 
