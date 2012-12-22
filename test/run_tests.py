@@ -7,7 +7,7 @@ import subprocess
 ROBOT_ARGS = [
     '--doc', 'SudsLibrary_Acceptance_Tests',
     '--outputdir', testenv.RESULTS_DIR,
-    '--log', 'none',
+    #'--log', 'none',
     '--pythonpath', testenv.SRC_DIR,
 ]
 

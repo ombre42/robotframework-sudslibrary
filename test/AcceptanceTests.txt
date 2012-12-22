@@ -1,230 +1,234 @@
-| *** Settings *** |
-| Suite Setup    | Start Services |
-| Suite Teardown | Stop Services |
-| Library        | XML |
-| Library        | Collections |
-| Library        | SudsLibrary |
-| Library        | TestWebServices.py |
-| Library        | Loggers.py |
+*** Settings ***
+Suite Setup       Start Services
+Suite Teardown    Stop Services
+Library           XML
+Library           Collections
+Library           SudsLibrary
+Library           TestWebServices.py
+Library           Loggers.py
 
-| *** Variables *** |
-| ${TEST WSDL URL} | http://localhost:8080/TestService/soap11/description |
-| ${JOHN PARSONS} | <?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="urn:TestService" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><ns:returnComplexTypeResponse><result><first-name>John</first-name><last-name>Parsons</last-name></result></ns:returnComplexTypeResponse></SOAP-ENV:Body></SOAP-ENV:Envelope> |
-| ${CALCULATOR WSDL URL} | http://localhost:8080/Calculator/soap11/description |
+*** Variables ***
+${TEST WSDL URL}    http://localhost:8080/TestService/soap11/description
+${JOHN PARSONS}    <?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="urn:TestService" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><ns:returnComplexTypeResponse><result><first-name>John</first-name><last-name>Parsons</last-name></result></ns:returnComplexTypeResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
+${CALCULATOR WSDL URL}    http://localhost:8080/Calculator/soap11/description
 
-| *** Test Cases *** |
-| Several Ways To Handle Plurality |
-|    | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ |
-|    | Create Client | http://www.webservicex.net/Statistics.asmx?WSDL |
-|    | ${nums} | Create List | ${4.5} | ${6.7} |
-|    | ${dic} | Create Dictionary | double | ${nums} |
-|    | ${resp} | Call Soap Method | GetStatistics | ${dic} |
-|    | ${ArrayOfDouble} | Create Wsdl Object | ArrayOfDouble |
-|    | Append To List | ${ArrayOfDouble.double} | ${6.7} |
-|    | ${resp} | Call Soap Method | GetStatistics | ${ArrayOfDouble} |
-|    | Comment | this does NOT work |
-|    | ${dbl} | Create Wsdl Object | ns0:double |
-|    | Set Wsdl Object Attribute | ${dbl} | value | ${4.5} |
-|    | ${doubles} | Create List | ${dbl} |
-|    | ${resp} | Call Soap Method | GetStatistics | ${doubles} |
+*** Test Cases ***
+Several Ways To Handle Plurality
+    Add Doctor Import    http://schemas.xmlsoap.org/soap/encoding/
+    Create Client    http://www.webservicex.net/Statistics.asmx?WSDL
+    ${nums}    Create List    ${4.5}    ${6.7}
+    ${dic}    Create Dictionary    double    ${nums}
+    ${resp}    Call Soap Method    GetStatistics    ${dic}
+    ${ArrayOfDouble}    Create Wsdl Object    ArrayOfDouble
+    Append To List    ${ArrayOfDouble.double}    ${6.7}
+    ${resp}    Call Soap Method    GetStatistics    ${ArrayOfDouble}
+    Comment    this does NOT work
+    ${dbl}    Create Wsdl Object    ns0:double
+    Set Wsdl Object Attribute    ${dbl}    value    ${4.5}
+    ${doubles}    Create List    ${dbl}
+    ${resp}    Call Soap Method    GetStatistics    ${doubles}
 
-| Using A Local WSDL |
-|    | [Documentation] | Local copy of WSDL likely has incorrect locations. |
-|    | Create Client | ${CURDIR}/wsdls/Calculator.wsdl |
-|    | ${sum} | Call Soap Method | add | 1 | 41 |
-|    | Should Be Equal As Numbers | ${sum} | 42 |
+Using A Local WSDL
+    [Documentation]    Local copy of WSDL likely has incorrect locations.
+    Create Client    ${CURDIR}/wsdls/Calculator.wsdl
+    ${sum}    Call Soap Method    add    1    41
+    Should Be Equal As Numbers    ${sum}    42
 
-| Complex Argument Using A Dictionary |
-|    | [Documentation] | This is not the preferred way to use Suds. |
-|    | Create Client | ${TEST WSDL URL} |
-|    | ${dict} | Evaluate | {'first-name':'George','last-name':'Cooper'} |
-|    | ${reply} | Call Soap Method | complexTypeArgument | ${dict} |
-|    | Should Be Equal As Strings | ${reply} | George Cooper |
+Complex Argument Using A Dictionary
+    [Documentation]    This is not the preferred way to use Suds.
+    Create Client    ${TEST WSDL URL}
+    ${dict}    Evaluate    {'first-name':'George','last-name':'Cooper'}
+    ${reply}    Call Soap Method    complexTypeArgument    ${dict}
+    Should Be Equal As Strings    ${reply}    George Cooper
 
-| Set Return XML |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Set Return Xml | True |
-|    | ${resp} | Call Soap Method | returnComplexType | John | Parsons |
-|    | Should Be Equal As Strings | ${resp} | ${JOHN PARSONS} |
+Set Return XML
+    Create Client    ${TEST WSDL URL}
+    Set Return Xml    True
+    ${resp}    Call Soap Method    returnComplexType    John    Parsons
+    Should Be Equal As Strings    ${resp}    ${JOHN PARSONS}
 
-| Expecting Fault |
-|    | Create Client | ${TEST WSDL URL} |
-|    | ${fault} | Call Soap Method Expecting Fault | returnComplexType |
-|    | Should Be Equal As Strings | ${fault.faultstring} | \ninterface name: soap11\nservice name: TestService\nParameter "first_name" is not optional |
+Expecting Fault
+    Create Client    ${TEST WSDL URL}
+    ${fault}    Call Soap Method Expecting Fault    returnComplexType
+    Should Be Equal As Strings    ${fault.faultstring}    \ninterface name: soap11\nservice name: TestService\nParameter "first_name" is not optional
 
-| Expecting Fault w/ retxml |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Set Return Xml | true |
-|    | ${resp} | Call Soap Method Expecting Fault | returnComplexType |
-|    | Should Start With | ${resp} | <?xml |
-|    | Should Contain | ${resp} | <SOAP-ENV:Fault> |
+Expecting Fault w/ retxml
+    Create Client    ${TEST WSDL URL}
+    Set Return Xml    true
+    ${resp}    Call Soap Method Expecting Fault    returnComplexType
+    Should Start With    ${resp}    <?xml
+    Should Contain    ${resp}    <SOAP-ENV:Fault>
 
-| Complex Type Argument |
-|    | Create Client | ${TEST WSDL URL} |
-|    | ${person} | Create Wsdl Object | Person |
-|    | Set Wsdl Object Attribute | ${person} | first-name | Phillip |
-|    | Set Wsdl Object Attribute | ${person} | last-name | McCann |
-|    | ${resp} | Call Soap Method | complexTypeArgument | ${person} |
-|    | Should Be Equal As Strings | ${resp} | Phillip McCann |
+Complex Type Argument
+    Create Client    ${TEST WSDL URL}
+    ${person}    Create Wsdl Object    Person
+    Set Wsdl Object Attribute    ${person}    first-name    Phillip
+    Set Wsdl Object Attribute    ${person}    last-name    McCann
+    ${resp}    Call Soap Method    complexTypeArgument    ${person}
+    Should Be Equal As Strings    ${resp}    Phillip McCann
 
-| Set Port |
-|    | Create Client | ${CURDIR}/wsdls/TestService_ports.wsdl |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Port | TestService |
-|    | Call Soap Method | theAnswer |
-|    | Set Port | 0 |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Port | 1 |
-|    | Call Soap Method | theAnswer |
+Set Port
+    Create Client    ${CURDIR}/wsdls/TestService_ports.wsdl
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Port    TestService
+    Call Soap Method    theAnswer
+    Set Port    0
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Port    1
+    Call Soap Method    theAnswer
 
-| Set Service |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Create Client | ${CURDIR}/wsdls/TestService_services.wsdl |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Service | TestService |
-|    | Call Soap Method | theAnswer |
-|    | Set Service | 0 |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Service | 1 |
-|    | Call Soap Method | theAnswer |
+Set Service
+    Create Client    ${TEST WSDL URL}
+    Create Client    ${CURDIR}/wsdls/TestService_services.wsdl
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Service    TestService
+    Call Soap Method    theAnswer
+    Set Service    0
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Service    1
+    Call Soap Method    theAnswer
 
-| Specific Call - Port |
-|    | Create Client | ${CURDIR}/wsdls/TestService_ports.wsdl |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Specific Soap Call | ${None} | 1 | theAnswer |
-|    | Specific Soap Call |    | TestService | theAnswer |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Port | BadPort |
-|    | Specific Soap Call | ${EMPTY} | TestService | theAnswer |
+Specific Call - Port
+    Create Client    ${CURDIR}/wsdls/TestService_ports.wsdl
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Specific Soap Call    ${None}    1    theAnswer
+    Specific Soap Call    \    TestService    theAnswer
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Port    BadPort
+    Specific Soap Call    ${EMPTY}    TestService    theAnswer
 
-| Specific Call - Service |
-|    | Create Client | ${CURDIR}/wsdls/TestService_services.wsdl |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Service | HEY OH |
-|    | Specific Soap Call | 1 | ${None} | theAnswer |
-|    | Specific Soap Call | TestService |    | theAnswer |
+Specific Call - Service
+    Create Client    ${CURDIR}/wsdls/TestService_services.wsdl
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Service    HEY OH
+    Specific Soap Call    1    ${None}    theAnswer
+    Specific Soap Call    TestService    \    theAnswer
 
-| Set Proxy |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Call Soap Method | theAnswer |
-|    | Set Proxies | http | localhost:9090 |
-|    | Run Keyword And Expect Error | URLError: <urlopen error [Errno 10061] No connection could be made because the target machine actively refused it> | Call Soap Method | theAnswer |
+Set Proxy
+    Create Client    ${TEST WSDL URL}
+    Call Soap Method    theAnswer
+    Set Proxies    http    localhost:9090
+    Run Keyword And Expect Error    URLError: <urlopen error [Errno 10061] No connection could be made because the target machine actively refused it>    Call Soap Method    theAnswer
 
-| Return XML And Verify With XML Library |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Set Return Xml | True |
-|    | ${resp} | Call Soap Method | returnComplexType | John | Parsons |
-|    | ${first name elem} | XML.Get Element | ${resp} | .//result/first-name |
-|    | Element Text Should Be | ${first name elem} | John |
+Return XML And Verify With XML Library
+    Create Client    ${TEST WSDL URL}
+    Set Return Xml    True
+    ${resp}    Call Soap Method    returnComplexType    John    Parsons
+    ${first name elem}    XML.Get Element    ${resp}    .//result/first-name
+    Element Text Should Be    ${first name elem}    John
 
-| Two Clients By Index |
-|    | ${calc index} | Create Client | ${CALCULATOR WSDL URL} |
-|    | ${test index} | Create Client | ${TEST WSDL URL} |
-|    | Switch Client | ${calc index} |
-|    | ${sum} | Call Soap Method | add | 1 | 1 |
-|    | Should Be Equal As Numbers | ${sum} | 2 |
-|    | Switch Client | ${test index} |
-|    | ${answer} | Call Soap Method | theAnswer |
-|    | Should Be Equal As Numbers | ${answer} | 42 |
+Two Clients By Index
+    ${calc index}    Create Client    ${CALCULATOR WSDL URL}
+    ${test index}    Create Client    ${TEST WSDL URL}
+    Switch Client    ${calc index}
+    ${sum}    Call Soap Method    add    1    1
+    Should Be Equal As Numbers    ${sum}    2
+    Switch Client    ${test index}
+    ${answer}    Call Soap Method    theAnswer
+    Should Be Equal As Numbers    ${answer}    42
 
-| Two Clients By Alias |
-|    | Create Client | ${CALCULATOR WSDL URL} | calc |
-|    | Create Client | ${TEST WSDL URL} | test |
-|    | Switch Client | c A l C |
-|    | ${sum} | Call Soap Method | add | 1 | 1 |
-|    | Should Be Equal As Numbers | ${sum} | 2 |
-|    | Switch Client | test |
-|    | ${answer} | Call Soap Method | theAnswer |
-|    | Should Be Equal As Numbers | ${answer} | 42 |
+Two Clients By Alias
+    Create Client    ${CALCULATOR WSDL URL}    calc
+    Create Client    ${TEST WSDL URL}    test
+    Switch Client    c A l C
+    ${sum}    Call Soap Method    add    1    1
+    Should Be Equal As Numbers    ${sum}    2
+    Switch Client    test
+    ${answer}    Call Soap Method    theAnswer
+    Should Be Equal As Numbers    ${answer}    42
 
-| Two Clients Different Settings |
-|    | Create Client | ${TEST WSDL URL} | test |
-|    | Set Return Xml | True |
-|    | Create Client | ${CALCULATOR WSDL URL} | calc |
-|    | ${sum} | Call Soap Method | add | 1 | 1 |
-|    | Should Be Equal As Numbers | ${sum} | 2 |
-|    | Switch Client | test |
-|    | ${resp} | Call Soap Method | returnComplexType | John | Parsons |
-|    | Should Be Equal As Strings | ${resp} | ${JOHN PARSONS} |
+Two Clients Different Settings
+    Create Client    ${TEST WSDL URL}    test
+    Set Return Xml    True
+    Create Client    ${CALCULATOR WSDL URL}    calc
+    ${sum}    Call Soap Method    add    1    1
+    Should Be Equal As Numbers    ${sum}    2
+    Switch Client    test
+    ${resp}    Call Soap Method    returnComplexType    John    Parsons
+    Should Be Equal As Strings    ${resp}    ${JOHN PARSONS}
 
-| ImportDoctor |
-|    | Create Client | ${CURDIR}/wsdls/TestService_missing_import.wsdl |
-|    | Run Keyword And Expect Error | TypeNotFound: Type not found: 'ns0:string' | Create Wsdl Object | ns0:string |
-|    | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ |
-|    | Run Keyword And Expect Error | TypeNotFound: Type not found: 'ns0:string' | Create Wsdl Object | ns0:string |
-|    | Create Client | ${CURDIR}/wsdls/TestService_missing_import.wsdl |
-|    | Create Wsdl Object | ns0:string |
+ImportDoctor
+    Create Client    ${CURDIR}/wsdls/TestService_missing_import.wsdl
+    Run Keyword And Expect Error    TypeNotFound: Type not found: 'ns0:string'    Create Wsdl Object    ns0:string
+    Add Doctor Import    http://schemas.xmlsoap.org/soap/encoding/
+    Run Keyword And Expect Error    TypeNotFound: Type not found: 'ns0:string'    Create Wsdl Object    ns0:string
+    Create Client    ${CURDIR}/wsdls/TestService_missing_import.wsdl
+    Create Wsdl Object    ns0:string
 
-| SOAP Headers Using WSDL Object |
-|    | Create Client | ${CURDIR}/wsdls/soapheaders.wsdl |
-|    | ${auth header} | Create Wsdl Object | AuthHeader |
-|    | Set Wsdl Object Attribute | ${auth header} | UserName | gcarlson |
-|    | Set Wsdl Object Attribute | ${auth header} | Password | heyOh |
-|    | Set Soap Headers | ${auth header} |
-|    | Run Keyword And Ignore Error | Call Soap Method | DoIt |
-|    | ${lib} | Get Library Instance | SudsLibrary |
-|    | ${listener} | Set Variable | ${lib._listener} |
-|    | ${xml} | Call Method | ${listener} | last_sent |
-|    | Should Contain | ${xml} | <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>gcarlson</tns:UserName><tns:Password>heyOh</tns:Password></tns:AuthHeader></SOAP-ENV:Header> |
+SOAP Headers Using WSDL Object
+    Create Client    ${CURDIR}/wsdls/soapheaders.wsdl
+    ${auth header}    Create Wsdl Object    AuthHeader
+    Set Wsdl Object Attribute    ${auth header}    UserName    gcarlson
+    Set Wsdl Object Attribute    ${auth header}    Password    heyOh
+    Set Soap Headers    ${auth header}
+    Run Keyword And Ignore Error    Call Soap Method    DoIt
+    ${lib}    Get Library Instance    SudsLibrary
+    ${listener}    Set Variable    ${lib._listener}
+    ${xml}    Call Method    ${listener}    last_sent
+    Should Contain    ${xml}    <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>gcarlson</tns:UserName><tns:Password>heyOh</tns:Password></tns:AuthHeader></SOAP-ENV:Header>
 
-| SOAP Headers Using Dict |
-|    | Create Client | ${CURDIR}/wsdls/soapheaders.wsdl |
-|    | ${auth dict} | Create Dictionary | UserName | sjenson | Password | power |
-|    | Set Soap Headers | ${auth dict} |
-|    | Run Keyword And Ignore Error | Call Soap Method | DoIt |
-|    | ${lib} | Get Library Instance | SudsLibrary |
-|    | ${listener} | Set Variable | ${lib._listener} |
-|    | ${xml} | Call Method | ${listener} | last_sent |
-|    | Should Contain | ${xml} | <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>sjenson</tns:UserName><tns:Password>power</tns:Password></tns:AuthHeader></SOAP-ENV:Header> |
+SOAP Headers Using Dict
+    Create Client    ${CURDIR}/wsdls/soapheaders.wsdl
+    ${auth dict}    Create Dictionary    UserName    sjenson    Password    power
+    Set Soap Headers    ${auth dict}
+    Run Keyword And Ignore Error    Call Soap Method    DoIt
+    ${lib}    Get Library Instance    SudsLibrary
+    ${listener}    Set Variable    ${lib._listener}
+    ${xml}    Call Method    ${listener}    last_sent
+    Should Contain    ${xml}    <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>sjenson</tns:UserName><tns:Password>power</tns:Password></tns:AuthHeader></SOAP-ENV:Header>
 
-| Headers |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Set Headers | abc | 123 |
-|    | Call Soap Method | theAnswer |
-|    | ${request} | Get Sent Request |
-|    | Should Be Equal As Strings | ${request.headers['abc']} | 123 |
-|    | ${headers} | Create Dictionary | foo | bar |
-|    | Set Headers | ${headers} |
-|    | Call Soap Method | theAnswer |
-|    | ${request} | Get Sent Request |
-|    | Should Be Equal As Strings | ${request.headers['foo']} | bar |
-|    | Run Keyword And Expect Error | ValueError: There should be an even number of name-value pairs. | Set Headers | 1 | 2 | 3 |
+Headers
+    Create Client    ${TEST WSDL URL}
+    Set Headers    abc    123
+    Call Soap Method    theAnswer
+    ${request}    Get Sent Request
+    Should Be Equal As Strings    ${request.headers['abc']}    123
+    ${headers}    Create Dictionary    foo    bar
+    Set Headers    ${headers}
+    Call Soap Method    theAnswer
+    ${request}    Get Sent Request
+    Should Be Equal As Strings    ${request.headers['foo']}    bar
+    Run Keyword And Expect Error    ValueError: There should be an even number of name-value pairs.    Set Headers    1    2    3
 
-| Return ComplexType and Alter |
-|    | Create Client | ${TEST WSDL URL} |
-|    | ${person} | Call Soap Method | returnComplexType | John | Parsons |
-|    | Set Wsdl Object Attribute | ${person} | first-name | Bob |
-|    | ${first name} | Get Wsdl Object Attribute | ${person} | first-name |
-|    | Should Be Equal As Strings | ${first name} | Bob |
+Return ComplexType and Alter
+    Create Client    ${TEST WSDL URL}
+    ${person}    Call Soap Method    returnComplexType    John    Parsons
+    Set Wsdl Object Attribute    ${person}    first-name    Bob
+    ${first name}    Get Wsdl Object Attribute    ${person}    first-name
+    Should Be Equal As Strings    ${first name}    Bob
 
-| Http Authentication |
-|    | Create Client | ${CURDIR}/wsdls/Calculator.wsdl |
-|    | Set Http Authentication | bob | foo | STANDARD |
-|    | ${sum} | Call Soap Method | add | 1 | 41 |
-|    | ${request} | Get Sent Request |
-|    | Dictionary Should Not Contain Key | ${request.headers} | Authorization |
-|    | Set Http Authentication | bob | foo | ALWAYS_send |
-|    | ${sum} | Call Soap Method | add | 1 | 41 |
-|    | ${request} | Get Sent Request |
-|    | Should Be Equal As Strings | ${request.headers['Authorization']} | Basic Ym9iOmZvbw== |
-|    | Run Keyword And Expect Error | ValueError: 'bad' is not a supported type. | Set Http Authentication | bob | foo | bad |
+Http Authentication
+    Create Client    ${CURDIR}/wsdls/Calculator.wsdl
+    Set Http Authentication    bob    foo    STANDARD
+    ${sum}    Call Soap Method    add    1    41
+    ${request}    Get Sent Request
+    Dictionary Should Not Contain Key    ${request.headers}    Authorization
+    Set Http Authentication    bob    foo    ALWAYS_send
+    ${sum}    Call Soap Method    add    1    41
+    ${request}    Get Sent Request
+    Should Be Equal As Strings    ${request.headers['Authorization']}    Basic Ym9iOmZvbw==
+    Run Keyword And Expect Error    ValueError: 'bad' is not a supported type.    Set Http Authentication    bob    foo    bad
 
-| Set Location |
-|    | Create Client | ${TEST WSDL URL} |
-|    | Set Location | http://localhost:8080/badpath |
-|    | Run Keyword And Expect Error | * | Call Soap Method | theAnswer |
-|    | Set Location | http://localhost:8080/TestService/soap11/ |
-|    | Call Soap Method | theAnswer |
-|    | Set Location | http://localhost:8080/badpath |    | complexTypeArgument |
-|    | ${dict} | Evaluate | {'first-name':'George','last-name':'Cooper'} |
-|    | Run Keyword And Expect Error | * | Call Soap Method | complexTypeArgument | ${dict} |
-|    | Call Soap Method | theAnswer |
-|    | Create Client | ${CURDIR}/wsdls/TestService_services.wsdl |
-|    | Set Location | http://localhost:8080/TestService/soap11/ | ALL_SERVICES | theAnswer |
-|    | Specific Soap Call | 0 |    | theAnswer |
-|    | Specific Soap Call | 1 |    | theAnswer |
-|    | Run Keyword And Expect Error | ServiceNotFound: Service not found: 'wohoo' | Set Location | http://localhost:8080/badpath | wohoo |
+Set Location
+    Create Client    ${TEST WSDL URL}
+    Set Location    http://localhost:8080/badpath
+    Run Keyword And Expect Error    *    Call Soap Method    theAnswer
+    Set Location    http://localhost:8080/TestService/soap11/
+    Call Soap Method    theAnswer
+    Set Location    http://localhost:8080/badpath    \    complexTypeArgument
+    ${dict}    Evaluate    {'first-name':'George','last-name':'Cooper'}
+    Run Keyword And Expect Error    *    Call Soap Method    complexTypeArgument    ${dict}
+    Call Soap Method    theAnswer
+    Create Client    ${CURDIR}/wsdls/TestService_services.wsdl
+    Set Location    http://localhost:8080/TestService/soap11/    ALL_SERVICES    theAnswer
+    Specific Soap Call    0    \    theAnswer
+    Specific Soap Call    1    \    theAnswer
+    Run Keyword And Expect Error    ServiceNotFound: Service not found: 'wohoo'    Set Location    http://localhost:8080/badpath    wohoo
 
-| *** Keywords *** |
-| Create Client With Bad Locations And Missing Schema |
-|    | SudsLibrary.Create Client | ../../Statistics.wsdl |
+Suds Null Variable
+    ${null string}    Convert To String    ${SUDS_NULL}
+    Should Start With    ${null string}    <suds.null instance
+
+*** Keywords ***
+Create Client With Bad Locations And Missing Schema
+    SudsLibrary.Create Client    ../../Statistics.wsdl
