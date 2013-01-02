@@ -229,6 +229,21 @@ Suds Null Variable
     ${null string}    Convert To String    ${SUDS_NULL}
     Should Start With    ${null string}    <suds.null instance
 
+SOAP Logging
+    [Documentation]    LOG 2 INFO REGEXP: Sending to http:.*
+    ...    LOG 5 NONE
+    ...    LOG 7 INFO REGEXP: Sending to http:.*
+    ...    LOG 9 NONE
+    Create Client    ${TEST WSDL URL}    on
+    Call Soap Method    theAnswer
+    Create Client    ${TEST WSDL URL}    off
+    Set Soap Logging    false
+    Call Soap Method    theAnswer
+    Switch Client    on
+    Call Soap Method    theAnswer
+    Switch Client    off
+    Call Soap Method    theAnswer
+
 *** Keywords ***
 Create Client With Bad Locations And Missing Schema
     SudsLibrary.Create Client    ../../Statistics.wsdl
