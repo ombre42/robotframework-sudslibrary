@@ -43,9 +43,14 @@ Complex Argument Using A Dictionary
 
 Set Return XML
     Create Client    ${TEST WSDL URL}
-    Set Return Xml    True
+    ${initial value}    Set Return Xml    True
+    Should Not Be True    ${initial value}
     ${resp}    Call Soap Method    returnComplexType    John    Parsons
     Should Be Equal As Strings    ${resp}    ${JOHN PARSONS}
+    ${new value}    Set Return Xml    false
+    Should Be True    ${new value}
+    ${resp}    Call Soap Method    returnComplexType    John    Parsons
+    Should Not Be Equal As Strings    ${resp}    ${JOHN PARSONS}
 
 Expecting Fault
     Create Client    ${TEST WSDL URL}
@@ -231,17 +236,21 @@ Suds Null Variable
 
 SOAP Logging
     [Documentation]    LOG 2 INFO REGEXP: Sending to http:.*
-    ...    LOG 5 NONE
-    ...    LOG 7 INFO REGEXP: Sending to http:.*
-    ...    LOG 9 NONE
+    ...    LOG 6 NONE
+    ...    LOG 8 INFO REGEXP: Sending to http:.*
+    ...    LOG 10 NONE LOG 13 INFO REGEXP: Sending to http:.*
     Create Client    ${TEST WSDL URL}    on
     Call Soap Method    theAnswer
     Create Client    ${TEST WSDL URL}    off
-    Set Soap Logging    false
+    ${initial value}    Set Soap Logging    false
+    Should Be True    ${initial value}
     Call Soap Method    theAnswer
     Switch Client    on
     Call Soap Method    theAnswer
     Switch Client    off
+    Call Soap Method    theAnswer
+    ${new value}    Set Soap Logging    true
+    Should Not Be True    ${new value}
     Call Soap Method    theAnswer
 
 *** Keywords ***

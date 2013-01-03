@@ -22,7 +22,7 @@ def acceptance_tests(args):
     _make_results_dir()
     cmd = [runner] + ROBOT_ARGS + args + [testenv.TEST_DATA]
     print "Executing:\n" + " ".join(cmd)
-    subprocess.check_output(cmd)
+    subprocess.call(cmd)
     outputxml = join(testenv.RESULTS_DIR, "output.xml")
     statuschecker.process_output(outputxml)
     rc = robot.rebot(outputxml, outputdir=testenv.RESULTS_DIR)

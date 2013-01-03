@@ -93,8 +93,13 @@ class _OptionsKeywords(object):
         Python object graph.
 
         See also `Call Soap Method`, `Call Soap Method Expecting Fault`, and `Specific Soap Call`.
+        
+        Example:
+        | ${old value}= | Set Return Xml | True |
         """
+        old_value = self._client().options.retxml
         self._set_boolean_option('retxml', return_xml)
+        return old_value
 
     def set_http_authentication(self, username, password, type='STANDARD'):
         """Sets http authentication type and credentials.
