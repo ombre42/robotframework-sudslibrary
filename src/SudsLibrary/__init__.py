@@ -31,7 +31,62 @@ __version__ = VERSION
 
 class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords, 
                   _OptionsKeywords, _ProxyKeywords):
-    """Library for functional testing of SOAP-based web services.
+    """SudsLibrary is a library for functional testing of SOAP-based web 
+    services.
+    
+    == Creating and Configuring a Client ==
+    If necessary, use keywords `Bind Schema To Location` or `Add Doctor 
+    Import`. These are rarely needed. Next, `Create Client` to create a Suds 
+    client. The output from this keyword contains useful information including 
+    available types and methods. Next, the Set * keywords may then be used to 
+    configure the client if necessary. `Set Location` is the most commonly 
+    needed setting keyword.
+
+    == Working With WSDL Objects ==
+    When Suds digests a WSDL, it creates dynamic types to represent the 
+    complex types defined by the WSDL or its imports. These types may be used 
+    for method arguments, return values or both. `Create Wsdl Object` is used 
+    to create instances of WSDL objects to be used as arguments. A WSDL object 
+    returned by one method may also be used as an argument to another. 
+    `Set Wsdl Object Attribute` sets a WSDL object's attributes. Retrieving a 
+    WSDL object's attribute values may be done with either `Get Wsdl Object 
+    Attribute` or using extended variable syntax like ${object.attribute}. The 
+    keywords in the _BuiltIn_ and _Collections_ libraries may be used to 
+    verify attribute values.
+    
+    == Example Test ==
+    You can run this test because it uses a public web service.
+    
+    | Create Client              | http://www.webservicex.net/Statistics.asmx?WSDL |               |              |
+    | ${dbl array}=              | Create Wsdl Object                              | ArrayOfDouble |              |
+    | Append To List             | ${dbl array.double}                             | 2.0           |              |
+    | Append To List             | ${dbl array.double}                             | 3.0           |              |
+    | ${result}=                 | Call Soap Method                                | GetStatistics | ${dbl array} |
+    | Should Be Equal As Numbers | ${result.Average}                               | 2.5           |              |
+    
+    The definition of type ArrayOfDouble:
+    | <s:complexType name="ArrayOfDouble">
+    |   <s:sequence>
+    |     <s:element minOccurs="0" maxOccurs="unbounded" name="double" type="s:double"/>
+    |   </s:sequence>
+    | </s:complexType>
+    Note that the attribute name on the ArrayOfDouble-type that is the list of 
+    numbers is the singular "double". Outside of the WSDL, the structure can 
+    also be seen in the output of Create Wsdl Object:
+    | ${dbl array} = (ArrayOfDouble){
+    |   double[] = <empty>
+    | }
+    
+    The relevant part of the WSDL defining the parameters to the method:
+    | <s:element name="GetStatistics">
+    |   <s:complexType>
+    |     <s:sequence>
+    |       <s:element minOccurs="0" maxOccurs="1" name="X" type="tns:ArrayOfDouble"/>
+    |     </s:sequence>
+    |   </s:complexType>
+    | </s:element>
+    The definition of this method appears in the output of Create Client as:
+    | GetStatistics(ArrayOfDouble X, )
 
     === Passing Explicit NULL Values ===
     If you have a service that takes NULL values for required parameters or 
