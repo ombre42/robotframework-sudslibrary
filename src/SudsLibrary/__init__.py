@@ -96,6 +96,40 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     value. The soap message will contain an empty (and xsi:nil="true" if node 
     defined as nillable). ${SUDS_NULL} is defined during library 
     initialization, so editors like RIDE will not show it as defined.
+    
+    == Extending SudsLibrary ==
+    There may be times where Suds/SudsLibrary does not work using the library 
+    keywords alone. Extending the library instead of writing a custom one will 
+    allow you to use the existing keywords in SudsLibrary.
+    
+    There are two methods useful for extending SudsLibrary:
+    | _client()
+    | _add_client(client, alias=None)
+    The first can be used to access the current instance of 
+    suds.client.Client. The second can be used to put a client into the client 
+    cache that you have instantiated.
+    
+    Here is an example demonstrating how to implement a keyword that adds a 
+    MessagePlugin to the current Suds client (based on the [https://fedorahosted.org/suds/wiki/Documentation#MessagePlugin|Suds documentation]):
+    | from robot.libraries.BuiltIn import BuiltIn
+    | from suds.plugin import MessagePlugin
+    | 
+    | class _MyPlugin(MessagePlugin):
+    |     def marshalled(self, context):
+    |         body = context.envelope.getChild('Body')
+    |         foo = body[0]
+    |         foo.set('id', '12345')
+    |         foo.set('version', '2.0')
+    | 
+    | class SudsLibraryExtensions(object):
+    |     def attach_my_plugin(self):
+    |         client = BuiltIn().get_library_instance("SudsLibrary")._client()
+    |         # append so SudsLibrary's plugin is left in place
+    |         plugins = client.options.plugins
+    |         if any(isinstance(x, _MyPlugin) for x in plugins):
+    |             return
+    |         plugins.append(_MyPlugin())
+    |         client.set_options(plugins=plugins)
     """
 
     ROBOT_LIBRARY_VERSION = VERSION

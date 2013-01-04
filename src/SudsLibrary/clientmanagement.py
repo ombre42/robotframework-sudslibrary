@@ -41,17 +41,13 @@ class _ClientManagementKeywords(object):
         """
         url = self._get_url(url_or_path)
         autoblend = to_bool(autoblend)
-        kwargs = {'plugins': (self._listener,), 'autoblend': autoblend}
+        kwargs = {'autoblend': autoblend}
         imports = self._imports
         if imports:
             self._log_imports()
             kwargs['doctor'] = ImportDoctor(*imports)
         client = Client(url, **kwargs)
-        client.set_options(faults=True)
-        self._logger.info('Using WSDL at %s%s' % (url, client))
-        self._imports = []
-        self._logging_option[client] = True
-        return self._cache.register(client, alias)
+        return self._add_client(client, alias)
 
     def switch_client(self, index_or_alias):
         """Switches between clients using index or alias.
@@ -78,12 +74,24 @@ class _ClientManagementKeywords(object):
         client = self._cache.switch(index_or_alias)
         self._listener.log = self._logging_option[client]
 
-    # private
-
+    # PyAPI
+    
     def _client(self):
-        if not self._cache.current:
-            raise RuntimeError('No client was created')
+        """Returns the current suds.client.Client instance."""
         return self._cache.current
+
+    def _add_client(self, client, alias=None):
+        """Puts a client into the cache and returns the index.
+        
+        The added client becomes the current one."""
+        client.options.plugins.append(self._listener)
+        client.set_options(faults=True)
+        self._logger.info('Using WSDL at %s%s' % (client.wsdl.url, client))
+        self._imports = []
+        self._logging_option[client] = True
+        return self._cache.register(client, alias)
+
+    # private
 
     def _log_imports(self):
         if self._imports:
