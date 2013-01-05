@@ -253,6 +253,18 @@ SOAP Logging
     Should Not Be True    ${new value}
     Call Soap Method    theAnswer
 
+Create/Get Wsdl Object
+    Create Client    ${TEST WSDL URL}
+    ${person}    Create Wsdl Object    Person    first-name    Phillip    last-name    McCann
+    ${first name}    Get Wsdl Object Attribute    ${person}    first-name
+    ${last name}    Get Wsdl Object Attribute    ${person}    last-name
+    Should Be Equal As Strings    ${first name}    Phillip
+    Should Be Equal As Strings    ${last name}    McCann
+    Run Keyword And Expect Error    ValueError: Creating a WSDL object failed. There should be an even number of name-value pairs.    Create Wsdl Object    Person    first-name
+    Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Create Wsdl Object    Person    badname    value
+    Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
+    Run Keyword And Expect Error    ValueError: Object must be a WSDL object (suds.sudsobject.Object).    Get Wsdl Object Attribute    ${first name}    name
+
 *** Keywords ***
 Create Client With Bad Locations And Missing Schema
     SudsLibrary.Create Client    ../../Statistics.wsdl
