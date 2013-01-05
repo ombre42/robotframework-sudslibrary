@@ -21,7 +21,7 @@ class _ProxyKeywords(object):
     def call_soap_method(self, name, *args):
         """Calls the SOAP method with the given `name` and `args`.
 
-        Returns a Python object graph or SOAP envelope as a XML string 
+        Returns a Python object graph or SOAP envelope as a XML string
         depending on the client options.
         """
 
@@ -30,12 +30,12 @@ class _ProxyKeywords(object):
     def specific_soap_call(self, service, port, name, *args):
         """Calls the SOAP method overriding client settings.
 
-        If there is only one service specified then `service` is ignored. 
-        `service` and `port` can be either by name or index. If only `port` or 
-        `service` need to be specified, leave the other one blank. The index 
+        If there is only one service specified then `service` is ignored.
+        `service` and `port` can be either by name or index. If only `port` or
+        `service` need to be specified, leave the other one blank. The index
         is the order of appearence in the WSDL starting with 0.
-        
-        Returns a Python object graph or SOAP envelope as a XML string 
+
+        Returns a Python object graph or SOAP envelope as a XML string
         depending on the client options.
         """
 
@@ -44,10 +44,10 @@ class _ProxyKeywords(object):
     def call_soap_method_expecting_fault(self, name, *args):
         """Calls the SOAP method expecting the server to raise a fault.
 
-        Fails if the server does not raise a fault.  Returns a Python object 
-        graph or SOAP envelope as a XML string depending on the client 
+        Fails if the server does not raise a fault.  Returns a Python object
+        graph or SOAP envelope as a XML string depending on the client
         options.
-        
+
         A fault has the following attributes:\n
         | faultcode   | required |
         | faultstring | required |
@@ -66,9 +66,8 @@ class _ProxyKeywords(object):
         if port:
             client.set_options(port=parse_index(port))
         method = getattr(client.service, name)
-        self._listener.location = method.method.location
         retxml = client.options.retxml
-        received =  None
+        received = None
         try:
             received = method(*args)
             # client does not raise fault when retxml=True, this will cause it to be raised
@@ -85,3 +84,12 @@ class _ProxyKeywords(object):
         finally:
             self._restore_options()
         return received
+
+    # private
+
+    def _backup_options(self):
+        options = self._client().options
+        self._old_options = dict([[n, getattr(options, n)] for n in ('service', 'port')])
+
+    def _restore_options(self):
+        self._client().set_options(**self._old_options)

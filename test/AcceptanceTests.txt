@@ -167,20 +167,16 @@ SOAP Headers Using WSDL Object
     Set Wsdl Object Attribute    ${auth header}    Password    heyOh
     Set Soap Headers    ${auth header}
     Run Keyword And Ignore Error    Call Soap Method    DoIt
-    ${lib}    Get Library Instance    SudsLibrary
-    ${listener}    Set Variable    ${lib._listener}
-    ${xml}    Call Method    ${listener}    last_sent
-    Should Contain    ${xml}    <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>gcarlson</tns:UserName><tns:Password>heyOh</tns:Password></tns:AuthHeader></SOAP-ENV:Header>
+    ${last sent}    Get Last Sent
+    Should Contain    ${last sent}    <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>gcarlson</tns:UserName><tns:Password>heyOh</tns:Password></tns:AuthHeader></SOAP-ENV:Header>
 
 SOAP Headers Using Dict
     Create Client    ${CURDIR}/wsdls/soapheaders.wsdl
     ${auth dict}    Create Dictionary    UserName    sjenson    Password    power
     Set Soap Headers    ${auth dict}
     Run Keyword And Ignore Error    Call Soap Method    DoIt
-    ${lib}    Get Library Instance    SudsLibrary
-    ${listener}    Set Variable    ${lib._listener}
-    ${xml}    Call Method    ${listener}    last_sent
-    Should Contain    ${xml}    <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>sjenson</tns:UserName><tns:Password>power</tns:Password></tns:AuthHeader></SOAP-ENV:Header>
+    ${last sent}    Get Last Sent
+    Should Contain    ${last sent}    <SOAP-ENV:Header><tns:AuthHeader><tns:UserName>sjenson</tns:UserName><tns:Password>power</tns:Password></tns:AuthHeader></SOAP-ENV:Header>
 
 Headers
     Create Client    ${TEST WSDL URL}
@@ -234,11 +230,14 @@ Suds Null Variable
     ${null string}    Convert To String    ${SUDS_NULL}
     Should Start With    ${null string}    <suds.null instance
 
-SOAP Logging
-    [Documentation]    LOG 2 INFO REGEXP: Sending to http:.*
+Set Soap Logging
+    [Documentation]    LOG 2 INFO STARTS: Sending:
+    ...    <?xml
     ...    LOG 6 NONE
-    ...    LOG 8 INFO REGEXP: Sending to http:.*
-    ...    LOG 10 NONE LOG 13 INFO REGEXP: Sending to http:.*
+    ...    LOG 8 INFO STARTS: Sending:
+    ...    <?xml
+    ...    LOG 10 NONE LOG 13 INFO STARTS: Sending:
+    ...    <?xml
     Create Client    ${TEST WSDL URL}    on
     Call Soap Method    theAnswer
     Create Client    ${TEST WSDL URL}    off
@@ -253,6 +252,22 @@ SOAP Logging
     Should Not Be True    ${new value}
     Call Soap Method    theAnswer
 
+Get Last Sent/Received
+    Create Client    ${TEST WSDL URL}
+    ${last sent}    Get Last Sent
+    Should Be Equal    ${last sent}    ${None}
+    ${last received}    Get Last Received
+    Should Be Equal    ${last received}    ${None}
+    Call Soap Method    theAnswer
+    ${last sent}    Get Last Sent
+    Should Start With    ${last sent}    <?xml
+    ${last received}    Get Last Received
+    Should Start With    ${last received}    <?xml
+    ${lib}    Get Library Instance    SudsLibrary
+    ${client}    Call Method    ${lib}    _client
+    Remove From List    ${client.options.plugins}    0
+    Run Keyword And Expect Error    The SudsLibrary SOAP logging message plugin has been removed.    Get Last Sent
+
 Create/Get Wsdl Object
     Create Client    ${TEST WSDL URL}
     ${person}    Create Wsdl Object    Person    first-name    Phillip    last-name    McCann
@@ -265,6 +280,13 @@ Create/Get Wsdl Object
     Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
     Run Keyword And Expect Error    ValueError: Object must be a WSDL object (suds.sudsobject.Object).    Get Wsdl Object Attribute    ${first name}    name
 
+Set WSDL Object Attribute
+    Create Client    ${TEST WSDL URL}
+    ${person}    Create Wsdl Object    Person
+    Set Wsdl Object Attribute    ${person}    first-name    foo
+    ${first name}    Get Wsdl Object Attribute    ${person}    first-name
+    Should Be Equal As Strings    ${first name}    foo
+    Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
+    Run Keyword And Expect Error    ValueError: Object must be a WSDL object (suds.sudsobject.Object).    Set Wsdl Object Attribute    ${first name}    name    bob
+
 *** Keywords ***
-Create Client With Bad Locations And Missing Schema
-    SudsLibrary.Create Client    ../../Statistics.wsdl

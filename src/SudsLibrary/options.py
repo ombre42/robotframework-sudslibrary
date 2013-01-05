@@ -48,7 +48,7 @@ class _OptionsKeywords(object):
             raise ValueError("There should be an even number of protocol-url pairs.")
         proxy = {}
         for i in range(0, len(protocol_url_pairs), 2):
-            proxy[protocol_url_pairs[i]] = protocol_url_pairs[i+1]
+            proxy[protocol_url_pairs[i]] = protocol_url_pairs[i + 1]
         self._client().set_options(proxy=proxy)
 
     def set_headers(self, *dict_or_key_value_pairs):
@@ -66,7 +66,7 @@ class _OptionsKeywords(object):
         elif length % 2 == 0:
             headers = {}
             for i in range(0, len(dict_or_key_value_pairs), 2):
-                headers[dict_or_key_value_pairs[i]] = dict_or_key_value_pairs[i+1]
+                headers[dict_or_key_value_pairs[i]] = dict_or_key_value_pairs[i + 1]
         else:
             raise ValueError("There should be an even number of name-value pairs.")
         self._client().set_options(headers=headers)
@@ -84,16 +84,18 @@ class _OptionsKeywords(object):
         | Set Soap Headers          | ${auth dict}       | # using a dictionary |           |          |       |
         """
         self._client().set_options(soapheaders=headers)
-    
+
     def set_return_xml(self, return_xml):
         """Sets whether to return XML in future requests.
 
-        The default value is _False_. If `return_xml` is True, then return the 
-        SOAP envelope as a string in future requests. Otherwise, return a 
-        Python object graph.
+        The default value is _False_. If `return_xml` is _True_, then return
+        the SOAP envelope as a string in future requests. Otherwise, return a
+        Python object graph. `Get Last Received` returns the XML received
+        regardless of this setting.
 
-        See also `Call Soap Method`, `Call Soap Method Expecting Fault`, and `Specific Soap Call`.
-        
+        See also `Call Soap Method`, `Call Soap Method Expecting Fault`, and
+        `Specific Soap Call`.
+
         Example:
         | ${old value}= | Set Return Xml | True |
         """
@@ -103,12 +105,12 @@ class _OptionsKeywords(object):
 
     def set_http_authentication(self, username, password, type='STANDARD'):
         """Sets http authentication type and credentials.
-        
-        Available types are STANDARD, ALWAYS_SEND, and NTLM. Type STANDARD 
-        will only send credentials to the server upon request (HTTP/1.0 401 
-        Authorization Required) by the server only. Type ALWAYS_SEND will 
-        cause an Authorization header to be sent in every request. Type NTLM 
-        requires the python-ntlm package to be installed, which is not 
+
+        Available types are STANDARD, ALWAYS_SEND, and NTLM. Type STANDARD
+        will only send credentials to the server upon request (HTTP/1.0 401
+        Authorization Required) by the server only. Type ALWAYS_SEND will
+        cause an Authorization header to be sent in every request. Type NTLM
+        requires the python-ntlm package to be installed, which is not
         packaged with Suds or SudsLibrary.
         """
         classes = {
@@ -126,15 +128,15 @@ class _OptionsKeywords(object):
     def set_location(self, url, service='ALL_SERVICES', *names):
         """Sets location to use in future requests.
 
-        This is for when the location(s) specified in the WSDL are not correct. 
-        `service` is the name or index of the service to change and ignored 
-        unless there is more than one service. If `service` is ALL_SERVICES, 
-        then set the location on all services. If no methods names are given, 
+        This is for when the location(s) specified in the WSDL are not correct.
+        `service` is the name or index of the service to change and ignored
+        unless there is more than one service. If `service` is ALL_SERVICES,
+        then set the location on all services. If no methods names are given,
         then sets the location for all methods.
         """
         wsdl = self._client().wsdl
         service_count = len(wsdl.services)
-        service = 0 if (service_count==1) else parse_index(service)
+        service = 0 if (service_count == 1) else parse_index(service)
         names = names if names else None
         if service == 'ALL_SERVICES':
             for svc in wsdl.services:
@@ -143,21 +145,21 @@ class _OptionsKeywords(object):
             wsdl.services[service].setlocation(url, names)
         else:
             found = False
-            for svc in  wsdl.services:
+            for svc in wsdl.services:
                 if svc.name == service:
                     svc.setlocation(url, names)
                     return
-            raise ServiceNotFound, service
+            raise ServiceNotFound(service)
 
     def add_doctor_import(self, import_namespace, location=None, *filters):
         """Adds an import be used in the next client.
 
-        Doctor imports are applied to the _next_ client created with 
-        `Create Client`. Doctor imports are necessary when the references are 
-        made in one schema to named objects defined in another schema without 
-        importing it. Use location ${None} if you do not want to specify the 
-        location but want to specify filters. The following example would 
-        import the SOAP encoding schema into only the namespace 
+        Doctor imports are applied to the _next_ client created with
+        `Create Client`. Doctor imports are necessary when the references are
+        made in one schema to named objects defined in another schema without
+        importing it. Use location ${None} if you do not want to specify the
+        location but want to specify filters. The following example would
+        import the SOAP encoding schema into only the namespace
         http://some/namespace/A:
         | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | ${None} | http://some/namespace/A |
         """
@@ -170,39 +172,16 @@ class _OptionsKeywords(object):
     def bind_schema_to_location(self, namespace, location):
         """Sets the `location` for the given `namespace` of a schema.
 
-        This is for when an import statement specifies a schema but not its 
-        location. If the schemaLocation is present and incorrect, this will 
-        not override that. Bound schemas are shared amongst all instances of 
-        SudsLibrary. Schemas should be bound if necessary before `Add Doctor 
+        This is for when an import statement specifies a schema but not its
+        location. If the schemaLocation is present and incorrect, this will
+        not override that. Bound schemas are shared amongst all instances of
+        SudsLibrary. Schemas should be bound if necessary before `Add Doctor
         Import` or `Create Client` where appropriate.
         """
         BasicImport.bind(namespace, location)
-
-    def set_soap_logging(self, log):
-        """Sets whether to log the request and response for the current client.
-        
-        Logging is enabled by default. Disabling logging will reduce the size 
-        of the log. Returns the current value.
-        
-        Example:
-        | ${old log setting} | Set Soap Logging | True |
-        """
-        client = self._client()
-        old_value = self._logging_option[client]
-        new_value = to_bool(log)
-        self._logging_option[client] = new_value
-        self._listener.log = new_value
-        return old_value
 
     # private
 
     def _set_boolean_option(self, name, value):
         value = to_bool(value)
         self._client().set_options(**{name: value})
-
-    def _backup_options(self):
-        options = self._client().options
-        self._old_options = dict([[n, getattr(options, n)] for n in ('service', 'port')])
-
-    def _restore_options(self):
-        self._client().set_options(**self._old_options)

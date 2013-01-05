@@ -32,8 +32,8 @@ class _ClientManagementKeywords(object):
         Optional alias is an alias for the client instance and it can be used
         for switching between clients (just as index can be used). See `Switch
         Client` for more details.
-        
-        Autoblend ensures that the schema(s) defined within the WSDL import 
+
+        Autoblend ensures that the schema(s) defined within the WSDL import
         each other.
 
         | Create Client | http://localhost:8080/ws/Billing.asmx?WSDL |
@@ -71,25 +71,24 @@ class _ClientManagementKeywords(object):
         | # Do something ... |                |     |
         | Switch Client      | ${id}          |     |
         """
-        client = self._cache.switch(index_or_alias)
-        self._listener.log = self._logging_option[client]
+        self._cache.switch(index_or_alias)
 
     # PyAPI
-    
+
     def _client(self):
         """Returns the current suds.client.Client instance."""
         return self._cache.current
 
     def _add_client(self, client, alias=None):
         """Puts a client into the cache and returns the index.
-        
+
         The added client becomes the current one."""
-        client.options.plugins.append(self._listener)
         client.set_options(faults=True)
         self._logger.info('Using WSDL at %s%s' % (client.wsdl.url, client))
         self._imports = []
-        self._logging_option[client] = True
-        return self._cache.register(client, alias)
+        index = self._cache.register(client, alias)
+        self.set_soap_logging(True)
+        return index
 
     # private
 
