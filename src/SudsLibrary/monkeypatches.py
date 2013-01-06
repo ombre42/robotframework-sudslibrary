@@ -23,7 +23,7 @@ if py_version < 3.3:
         # from http://ronrothman.com/public/leftbraned/xml-dom-minidom-toprettyxml-and-silly-whitespace/
 
         def fixed_writexml(self, writer, indent="", addindent="", newl=""):
-            writer.write(indent+"<" + self.tagName)
+            writer.write(indent + "<" + self.tagName)
             attrs = self._get_attributes()
             a_names = attrs.keys()
             a_names.sort()
@@ -33,17 +33,17 @@ if py_version < 3.3:
                 writer.write("\"")
             if self.childNodes:
                 if len(self.childNodes) == 1 \
-                  and self.childNodes[0].nodeType == xml.dom.minidom.Node.TEXT_NODE:
+                        and self.childNodes[0].nodeType == xml.dom.minidom.Node.TEXT_NODE:
                     writer.write(">")
                     self.childNodes[0].writexml(writer, "", "", "")
                     writer.write("</%s>%s" % (self.tagName, newl))
                     return
-                writer.write(">%s"%(newl))
+                writer.write(">%s" % newl)
                 for node in self.childNodes:
-                    node.writexml(writer,indent+addindent,addindent,newl)
-                writer.write("%s</%s>%s" % (indent,self.tagName,newl))
+                    node.writexml(writer, indent + addindent, addindent, newl)
+                writer.write("%s</%s>%s" % (indent, self.tagName, newl))
             else:
-                writer.write("/>%s"%(newl))
+                writer.write("/>%s" % newl)
 
         xml.dom.minidom.Element.writexml = fixed_writexml
 

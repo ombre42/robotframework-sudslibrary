@@ -21,5 +21,6 @@ def parse_index(value):
     except (ValueError, TypeError):
         return value
 
+
 def to_bool(item):
     return BuiltIn().convert_to_boolean(item)
