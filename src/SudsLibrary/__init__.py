@@ -126,11 +126,11 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     | class SudsLibraryExtensions(object):
     |     def attach_my_plugin(self):
     |         client = BuiltIn().get_library_instance("SudsLibrary")._client()
-    |         # append so SudsLibrary's plugin is left in place
+    |         # prepend so SudsLibrary's plugin is left in place
     |         plugins = client.options.plugins
     |         if any(isinstance(x, _MyPlugin) for x in plugins):
     |             return
-    |         plugins.append(_MyPlugin())
+    |         plugins.insert(0, _MyPlugin())
     |         client.set_options(plugins=plugins)
     """
 
