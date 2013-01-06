@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import xml.dom.minidom
+from xml.parsers.expat import ExpatError
 from suds.plugin import MessagePlugin
 from robot.api import logger
 from .utils import *
@@ -32,7 +33,11 @@ class _SoapLogger(MessagePlugin):
             logger.info('Sending:\n%s' % self.last_sent(True))
 
     def last_sent(self, pretty=False):
-        return self._prettyxml(self._sent) if pretty else self._sent
+        # possible that text inserted into the post body, making it invalid XML
+        try:
+            return self._prettyxml(self._sent) if pretty else self._sent
+        except ExpatError:
+            return self._sent
 
     def received(self, context):
         self._received = context.reply
@@ -52,11 +57,12 @@ class _SoapLoggingKeywords(object):
     def set_soap_logging(self, log):
         """Sets whether to log the request and response for the current client.
 
-        Logging is enabled by default. Disabling logging will reduce the size
-        of the log. Returns the current value.
+        Logging is enabled by default. The message sent and received is logged
+        at level INFO. The XML is formatted for readability. Disabling logging
+        will reduce the size of the log. Returns the current value.
 
         Example:
-        | ${old log setting} | Set Soap Logging | True |
+        | ${old log setting} | Set Soap Logging | False |
         """
         new_value = to_bool(log)
         soap_logger = self._get_soap_logger()

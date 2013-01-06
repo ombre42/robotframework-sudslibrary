@@ -15,7 +15,6 @@
 from os.path import abspath, dirname, join
 from robot.utils import ConnectionCache
 from .monkeypatches import *
-from .plugins import _SudsListener
 from .factory import _FactoryKeywords
 from .clientmanagement import _ClientManagementKeywords
 from .options import _OptionsKeywords
