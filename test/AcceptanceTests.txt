@@ -276,8 +276,9 @@ Create/Get Wsdl Object
     Should Be Equal As Strings    ${first name}    Phillip
     Should Be Equal As Strings    ${last name}    McCann
     Run Keyword And Expect Error    ValueError: Creating a WSDL object failed. There should be an even number of name-value pairs.    Create Wsdl Object    Person    first-name
-    Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Create Wsdl Object    Person    badname    value
-    Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
+    Comment    suds and suds-jurko have slightly different error messages
+    Run Keyword And Expect Error    AttributeError: *Person*has no attribute 'badname'    Create Wsdl Object    Person    badname    value
+    Run Keyword And Expect Error    AttributeError: *Person*has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
     Run Keyword And Expect Error    ValueError: Object must be a WSDL object (suds.sudsobject.Object).    Get Wsdl Object Attribute    ${first name}    name
 
 Set WSDL Object Attribute
@@ -286,7 +287,8 @@ Set WSDL Object Attribute
     Set Wsdl Object Attribute    ${person}    first-name    foo
     ${first name}    Get Wsdl Object Attribute    ${person}    first-name
     Should Be Equal As Strings    ${first name}    foo
-    Run Keyword And Expect Error    AttributeError: Person instance has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
+    Comment    suds and suds-jurko have slightly different error messages
+    Run Keyword And Expect Error    AttributeError: *Person*has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
     Run Keyword And Expect Error    ValueError: Object must be a WSDL object (suds.sudsobject.Object).    Set Wsdl Object Attribute    ${first name}    name    bob
 
 *** Keywords ***
