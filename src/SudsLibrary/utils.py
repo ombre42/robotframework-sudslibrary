@@ -15,6 +15,7 @@
 from robot.libraries.BuiltIn import BuiltIn
 
 
+# assumed that no WSDL will have a service or port named "1", etc.
 def parse_index(value):
     try:
         return int(value)

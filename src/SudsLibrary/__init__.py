@@ -35,6 +35,9 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     """SudsLibrary is a library for functional testing of SOAP-based web
     services.
 
+    SudsLibrary is based on [https://fedorahosted.org/suds/|Suds], a dynamic
+    SOAP 1.1 client.
+
     == Creating and Configuring a Client ==
     If necessary, use keywords `Bind Schema To Location` or `Add Doctor
     Import`. These are rarely needed. Next, `Create Client` to create a Suds
@@ -44,14 +47,14 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     needed setting keyword.
 
     == Working With WSDL Objects ==
-    When Suds digests a WSDL, it creates dynamic types to represent the
-    complex types defined by the WSDL or its imports. These types may be used
-    for method arguments, return values or both. `Create Wsdl Object` is used
-    to create instances of WSDL objects to be used as arguments. A WSDL object
-    returned by one method may also be used as an argument to another.
+    When Suds digests a WSDL, it creates dynamic types to represent the complex
+    types defined by a WSDL or its imports. These types are listed in the
+    output of `Create Client`. WSDL objects are used as method arguments,
+    attribute values of other WSDL objects, and return values.
+    `Create Wsdl Object` is used to create instances of WSDL object types.
     `Set Wsdl Object Attribute` sets a WSDL object's attributes. Retrieving a
-    WSDL object's attribute values may be done with either `Get Wsdl Object
-    Attribute` or using extended variable syntax like ${object.attribute}. The
+    WSDL object's attribute value may be done with either `Get Wsdl Object
+    Attribute` or by using extended variable syntax like ${object.attribute}. The
     keywords in the _BuiltIn_ and _Collections_ libraries may be used to
     verify attribute values.
 
@@ -89,7 +92,7 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     The definition of this method appears in the output of Create Client as:
     | GetStatistics(ArrayOfDouble X, )
 
-    === Passing Explicit NULL Values ===
+    == Passing Explicit NULL Values ==
     If you have a service that takes NULL values for required parameters or
     you want to pass NULL for optional object attributes, you simply need to
     set the value to ${SUDS_NULL}. You need to use ${SUDS_NULL} instead of
