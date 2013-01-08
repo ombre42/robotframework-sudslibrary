@@ -61,9 +61,9 @@ class _ProxyKeywords(object):
     def _call(self, service, port, expect_fault, name, *args):
         client = self._client()
         self._backup_options()
-        if service:
+        if service or (service == 0):
             client.set_options(service=parse_index(service))
-        if port:
+        if port or (port == 0):
             client.set_options(port=parse_index(port))
         method = getattr(client.service, name)
         retxml = client.options.retxml

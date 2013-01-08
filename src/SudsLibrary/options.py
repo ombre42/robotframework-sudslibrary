@@ -125,26 +125,30 @@ class _OptionsKeywords(object):
         transport = _class(username=username, password=password)
         self._client().set_options(transport=transport)
 
-    def set_location(self, url, service='ALL_SERVICES', *names):
+    def set_location(self, url, service=None, *names):
         """Sets location to use in future requests.
 
         This is for when the location(s) specified in the WSDL are not correct.
         `service` is the name or index of the service to change and ignored
-        unless there is more than one service. If `service` is ALL_SERVICES,
-        then set the location on all services. If no methods names are given,
-        then sets the location for all methods.
+        unless there is more than one service. Leave `service` blank to set
+        the location on all services and still specify methods. If no methods names are given,
+        then sets the location for all methods of the service(s).
         """
         wsdl = self._client().wsdl
         service_count = len(wsdl.services)
-        service = 0 if (service_count == 1) else parse_index(service)
+        if (service_count == 1):
+            service = 0
+        elif service or (service == 0):
+            service = parse_index(service)
+        else:
+            service = None
         names = names if names else None
-        if service == 'ALL_SERVICES':
+        if service is None:
             for svc in wsdl.services:
                 svc.setlocation(url, names)
         elif isinstance(service, int):
             wsdl.services[service].setlocation(url, names)
         else:
-            found = False
             for svc in wsdl.services:
                 if svc.name == service:
                     svc.setlocation(url, names)
@@ -155,13 +159,12 @@ class _OptionsKeywords(object):
         """Adds an import be used in the next client.
 
         Doctor imports are applied to the _next_ client created with
-        `Create Client`. Doctor imports are necessary when the references are
+        `Create Client`. Doctor imports are necessary when references are
         made in one schema to named objects defined in another schema without
-        importing it. Use location ${None} if you do not want to specify the
-        location but want to specify filters. The following example would
-        import the SOAP encoding schema into only the namespace
-        http://some/namespace/A:
-        | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | ${None} | http://some/namespace/A |
+        importing it. Leave location blank to specify filters but not location.
+        The following example would import the SOAP encoding schema into only
+        the namespace http://some/namespace/A:
+        | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | | http://some/namespace/A |
         """
         location = location if location else None
         imp = Import(import_namespace, location)
