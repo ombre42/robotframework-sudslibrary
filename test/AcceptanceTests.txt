@@ -252,6 +252,17 @@ Set Soap Logging
     Should Not Be True    ${new value}
     Call Soap Method    theAnswer
 
+Soap Logging Options
+    [Documentation]    LOG 2 INFO REGEXP: .*(\\x0A|\\x0C)\\ {2}<SOAP-ENV:Header.*
+    ...    LOG 4 INFO REGEXP: .*(\\x0A|\\x0C)\\ {4}<SOAP-ENV:Header.*
+    ...    LOG 6 INFO REGEXP: .*><SOAP-ENV:Header.*
+    Create Client    ${TEST WSDL URL}
+    Call Soap Method    theAnswer
+    Set Soap Logging    true    indent=4
+    Call Soap Method    theAnswer
+    Set Soap Logging    true    prettyxml=false
+    Call Soap Method    theAnswer
+
 Get Last Sent/Received
     Create Client    ${TEST WSDL URL}
     ${last sent}    Get Last Sent

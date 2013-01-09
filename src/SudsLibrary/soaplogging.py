@@ -25,44 +25,57 @@ class _SoapLogger(MessagePlugin):
         self._sent = None
         self._received = None
         self.log = True
+        self.prettyxml = True
+        self._indent = 2
 
     def sending(self, context):
         self._sent = context.envelope
         self._received = None
         if self.log:
-            logger.info('Sending:\n%s' % self.last_sent(True))
+            logger.info('Sending:\n%s' % self.last_sent(self.prettyxml))
 
-    def last_sent(self, pretty=False):
+    def last_sent(self, prettyxml=False):
         # possible that text inserted into the post body, making it invalid XML
         try:
-            return self._prettyxml(self._sent) if pretty else self._sent
+            return self._prettyxml(self._sent) if prettyxml else self._sent
         except ExpatError:
             return self._sent
 
     def received(self, context):
         self._received = context.reply
         if self.log:
-            logger.info('Received:\n%s' % self.last_received(True))
+            logger.info('Received:\n%s' % self.last_received(self.prettyxml))
 
-    def last_received(self, pretty=False):
-        return self._prettyxml(self._received) if pretty else self._received
+    def last_received(self, prettyxml=False):
+        return self._prettyxml(self._received) if prettyxml else self._received
+
+    def set_indent(self, indent):
+        try:
+            self._indent = int(indent)
+        except ValueError:
+            raise ValueError("Cannot convert indent value '%s' to an integer"
+                             % indent)
 
     def _prettyxml(self, xml_string):
         dom = xml.dom.minidom.parseString(xml_string)
-        return dom.toprettyxml(indent="  ")
+        return dom.toprettyxml(indent=(self._indent * " "))
 
 
 class _SoapLoggingKeywords(object):
 
-    def set_soap_logging(self, log):
+    def set_soap_logging(self, log, prettyxml=None, indent=None):
         """Sets whether to log the request and response for the current client.
 
-        Logging is enabled by default. The message sent and received is logged
-        at level INFO. The XML is formatted for readability. Disabling logging
-        will reduce the size of the log. Returns the current value.
+        By default, the message sent and received is logged at level INFO,
+        pretty-formatted with an indent of 2 spaces per level. Setting `log`
+        to false will disable logging, reducing the size of the log. Boolean
+        option `prettyxml` controls whether the XML is pretty-formatted. `indent` should be the
+        number of spaces to indent per level. Returns the current value of log.
 
-        Example:
-        | ${old log setting} | Set Soap Logging | False |
+        Examples:
+        | ${old log value} | Set Soap Logging | False    |   |
+        | Call Soap Method | lengthyResponse  |          |   |
+        | Set Soap Logging | True             | True     | 4 |
         """
         new_value = to_bool(log)
         soap_logger = self._get_soap_logger()
@@ -72,6 +85,10 @@ class _SoapLoggingKeywords(object):
             soap_logger = self._add_soap_logger()
             old_value = False
         soap_logger.log = new_value
+        if not prettyxml is None:
+            soap_logger.prettyxml = to_bool(prettyxml)
+        if not indent is None:
+            soap_logger.set_indent(indent)
         return old_value
 
     def get_last_sent(self):
