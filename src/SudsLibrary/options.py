@@ -125,24 +125,24 @@ class _OptionsKeywords(object):
         transport = _class(username=username, password=password)
         self._client().set_options(transport=transport)
 
-    def set_location(self, url, service=None, *names):
+    def set_location(self, url, service=None, names=None):
         """Sets location to use in future requests.
 
         This is for when the location(s) specified in the WSDL are not correct.
         `service` is the name or index of the service to change and ignored
-        unless there is more than one service. Leave `service` blank to set
-        the location on all services and still specify methods. If no methods names are given,
-        then sets the location for all methods of the service(s).
+        unless there is more than one service. `names` should be either a
+        comma-delimited list of methods names or an iterable (e.g. a list). If
+        no methods names are given, then sets the location for all methods of
+        the service(s).
         """
         wsdl = self._client().wsdl
         service_count = len(wsdl.services)
         if (service_count == 1):
             service = 0
-        elif service or (service == 0):
+        elif not service is None:
             service = parse_index(service)
-        else:
-            service = None
-        names = names if names else None
+        if isinstance(names, basestring):
+            names = names.split(",")
         if service is None:
             for svc in wsdl.services:
                 svc.setlocation(url, names)
@@ -155,21 +155,25 @@ class _OptionsKeywords(object):
                     return
             raise ServiceNotFound(service)
 
-    def add_doctor_import(self, import_namespace, location=None, *filters):
+    def add_doctor_import(self, import_namespace, location=None, filters=None):
         """Adds an import be used in the next client.
 
         Doctor imports are applied to the _next_ client created with
         `Create Client`. Doctor imports are necessary when references are
         made in one schema to named objects defined in another schema without
-        importing it. Leave location blank to specify filters but not location.
-        The following example would import the SOAP encoding schema into only
-        the namespace http://some/namespace/A:
-        | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | | http://some/namespace/A |
+        importing it. Use `location` to specify the location to download the
+        schema file. `filters` should be either a comma-delimited list of
+        namespaces or an iterable (e.g. a list). The following example would
+        import the SOAP encoding schema into only the namespace
+        http://some/namespace/A if it is not already imported:
+        | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | filters=http://some/namespace/A |
         """
-        location = location if location else None
+        if isinstance(filters, basestring):
+            filters = filters.split(",")
         imp = Import(import_namespace, location)
-        for filter in filters:
-            imp.filter.add(filter)
+        if not filters is None:
+            for filter in filters:
+                imp.filter.add(filter)
         self._imports.append(imp)
 
     def bind_schema_to_location(self, namespace, location):

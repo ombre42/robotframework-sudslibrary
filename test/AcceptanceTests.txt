@@ -216,12 +216,12 @@ Set Location
     Run Keyword And Expect Error    *    Call Soap Method    theAnswer
     Set Location    http://localhost:8080/TestService/soap11/
     Call Soap Method    theAnswer
-    Set Location    http://localhost:8080/badpath    \    complexTypeArgument
+    Set Location    http://localhost:8080/badpath    names=complexTypeArgument
     ${dict}    Evaluate    {'first-name':'George','last-name':'Cooper'}
     Run Keyword And Expect Error    *    Call Soap Method    complexTypeArgument    ${dict}
     Call Soap Method    theAnswer
     Create Client    ${CURDIR}/wsdls/TestService_services.wsdl
-    Set Location    http://localhost:8080/TestService/soap11/    \    theAnswer
+    Set Location    http://localhost:8080/TestService/soap11/    names=theAnswer
     Specific Soap Call    0    \    theAnswer
     Specific Soap Call    1    \    theAnswer
     Run Keyword And Expect Error    ServiceNotFound: Service not found: 'wohoo'    Set Location    http://localhost:8080/badpath    wohoo
