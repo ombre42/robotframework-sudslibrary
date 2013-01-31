@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 from os.path import join, dirname
 
@@ -13,11 +14,31 @@ execfile(join(dirname(__file__), 'src', 'SudsLibrary', 'version.py'))
 DESCRIPTION = """
 SudsLibrary is a web service testing library for Robot Framework
 that leverages Suds to test SOAP-based services.
-"""[1:-1]
+""".strip()
+
+CLASSIFIERS  = """
+Development Status :: 4 - Beta
+License :: OSI Approved :: Apache Software License
+Operating System :: OS Independent
+Programming Language :: Python
+Topic :: Software Development :: Testing
+""".strip().splitlines()
+
+# determine whether to use Jurko's fork of Suds. This will only work for source
+# distributions.
+jurko = False
+try:
+    import suds
+    jurko = 'jurko' in suds.__version__
+except:
+    pass
+suds_rqmnt = 'suds >= 0.4' if not jurko else 'suds-jurko'
+suds_rqmnt = os.environ.get('SUDS_LIBRARY_SUDS_REQUIREMENT', suds_rqmnt)
+
 
 setup(name         = 'robotframework-sudslibrary',
       version      = VERSION,
-      description  = 'Web service testing library for Robot Framework',
+      description  = 'Robot Framework test library for SOAP-based services.',
       long_description = DESCRIPTION,
       author       = 'Kevin Ormbrek',
       author_email = '<kormbrek@gmail.com>',
@@ -25,16 +46,10 @@ setup(name         = 'robotframework-sudslibrary',
       license      = 'Apache License 2.0',
       keywords     = 'robotframework testing testautomation soap suds web service',
       platforms    = 'any',
-      classifiers  = [
-                        "Development Status :: 2 - Pre-Alpha",
-                        "License :: OSI Approved :: Apache Software License",
-                        "Operating System :: OS Independent",
-                        "Programming Language :: Python",
-                        "Topic :: Software Development :: Testing"
-                     ],
+      classifiers  = CLASSIFIERS,
       zip_safe     = True,
       install_requires = [
-                            'suds >= 0.4',
+                            suds_rqmnt,
                             'robotframework >= 2.6.0',
                          ],
       package_dir  = {'' : 'src'},
