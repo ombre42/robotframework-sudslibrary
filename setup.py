@@ -53,6 +53,5 @@ setup(name         = 'robotframework-sudslibrary',
                             'robotframework >= 2.6.0',
                          ],
       package_dir  = {'' : 'src'},
-      packages     = ['SudsLibrary'],
-      download_url = "https://github.com/ombre42/robotframework-sudslibrary/downloads"
+      packages     = ['SudsLibrary']
       )
