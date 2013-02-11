@@ -23,21 +23,21 @@ from .utils import *
 
 class _ClientManagementKeywords(object):
 
-    def create_client(self, url_or_path, alias=None, autoblend=False):
-        """Loads the WSDL from the given URL or path and creates a Suds client.
+    def create_soap_client(self, url_or_path, alias=None, autoblend=False):
+        """Loads a WSDL from the given URL/path and creates a Suds SOAP client.
 
         Returns the index of this client instance which can be used later to
-        switch back to it. See `Switch Client` for example.
+        switch back to it. See `Switch Soap Client` for example.
 
         Optional alias is an alias for the client instance and it can be used
         for switching between clients (just as index can be used). See `Switch
-        Client` for more details.
+        Soap Client` for more details.
 
         Autoblend ensures that the schema(s) defined within the WSDL import
         each other.
 
-        | Create Client | http://localhost:8080/ws/Billing.asmx?WSDL |
-        | Create Client | ${CURDIR}/../wsdls/tracking.wsdl |
+        | Create Soap Client | http://localhost:8080/ws/Billing.asmx?WSDL |
+        | Create Soap Client | ${CURDIR}/../wsdls/tracking.wsdl |
         """
         url = self._get_url(url_or_path)
         autoblend = to_bool(autoblend)
@@ -49,27 +49,27 @@ class _ClientManagementKeywords(object):
         client = Client(url, **kwargs)
         return self._add_client(client, alias)
 
-    def switch_client(self, index_or_alias):
+    def switch_soap_client(self, index_or_alias):
         """Switches between clients using index or alias.
 
         Index is returned from `Create Client` and alias can be given to it.
 
         Example:
-        | Create Client  | http://localhost:8080/Billing?wsdl   | Billing   |
-        | Create Client  | http://localhost:8080/Marketing?wsdl | Marketing |
-        | Call           | sendSpam                             |           |
-        | Switch Client  | Billing                              | # alias   |
-        | Call           | sendInvoices                         |           |
-        | Switch Client  | 2                                    | # index   |
+        | Create Soap Client  | http://localhost:8080/Billing?wsdl   | Billing   |
+        | Create Soap Client  | http://localhost:8080/Marketing?wsdl | Marketing |
+        | Call Soap Method    | sendSpam                             |           |
+        | Switch Soap Client  | Billing                              | # alias   |
+        | Call Soap Method    | sendInvoices                         |           |
+        | Switch Soap Client  | 2                                    | # index   |
 
         Above example expects that there was no other clients created when
         creating the first one because it used index '1' when switching to it
         later. If you aren't sure about that you can store the index into
         a variable as below.
 
-        | ${id} =            | Create Client  | ... |
-        | # Do something ... |                |     |
-        | Switch Client      | ${id}          |     |
+        | ${id} =            | Create Soap Client  | ... |
+        | # Do something ... |                     |     |
+        | Switch Soap Client      | ${id}          |     |
         """
         self._cache.switch(index_or_alias)
 

@@ -40,7 +40,7 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
 
     == Creating and Configuring a Client ==
     If necessary, use keywords `Bind Schema To Location` or `Add Doctor
-    Import`. These are rarely needed. Next, `Create Client` to create a Suds
+    Import`. These are rarely needed. Next, `Create Soap Client` to create a Suds
     client. The output from this keyword contains useful information including
     available types and methods. Next, the Set * keywords may then be used to
     configure the client if necessary. `Set Location` is the most commonly
@@ -49,7 +49,7 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     == Working With WSDL Objects ==
     When Suds digests a WSDL, it creates dynamic types to represent the complex
     types defined by a WSDL or its imports. These types are listed in the
-    output of `Create Client`. WSDL objects are used as method arguments,
+    output of `Create Soap Client`. WSDL objects are used as method arguments,
     attribute values of other WSDL objects, and return values.
     `Create Wsdl Object` is used to create instances of WSDL object types.
     `Set Wsdl Object Attribute` sets a WSDL object's attributes. Retrieving a
