@@ -42,21 +42,35 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     If necessary, use keywords `Bind Schema To Location` or `Add Doctor
     Import`. These are rarely needed. Next, `Create Soap Client` to create a Suds
     client. The output from this keyword contains useful information including
-    available types and methods. Next, the Set * keywords may then be used to
-    configure the client if necessary. `Set Location` is the most commonly
-    needed setting keyword.
+    available types and methods. Next, the options keywords may then be used to
+    configure the client if necessary. They all start with "Set". `Set
+    Location` is the most commonly needed keyword.
 
-    == Working With WSDL Objects ==
+    == Working with WSDL Objects ==
     When Suds digests a WSDL, it creates dynamic types to represent the complex
     types defined by a WSDL or its imports. These types are listed in the
     output of `Create Soap Client`. WSDL objects are used as method arguments,
     attribute values of other WSDL objects, and return values.
     `Create Wsdl Object` is used to create instances of WSDL object types.
-    `Set Wsdl Object Attribute` sets a WSDL object's attributes. Retrieving a
-    WSDL object's attribute value may be done with either `Get Wsdl Object
-    Attribute` or by using extended variable syntax like ${object.attribute}. The
-    keywords in the _BuiltIn_ and _Collections_ libraries may be used to
-    verify attribute values.
+
+    === Getting WSDL Object Attributes ===
+    Getting a WSDL object's attribute value may be done with `Get Wsdl Object
+    Attribute` or extended variable syntax*. Keywords from other libraries, such
+    as _BuiltIn_ and _Collections_ may be used to verify attribute values.
+    Examples:
+    | ${name}=        | Get Wsdl Object Attribute | ${person} | name |
+    | Should Be Equal | ${person.name}            | Bob       |      |
+
+    === Setting WSDL Object Attributes ===
+    Setting a WSDL object's attribute value may be done with `Set Wsdl Object
+    Attribute` or extended variable syntax*. `Set Wsdl Object Attribute`
+    verifies the argument is an object of the correct type and the attribute
+    exists.
+    | Set Wsdl Object Attribute | ${person}    | name | Tia |
+    | ${person.name}=           | Set Variable | Tia  |     |
+
+    * In order to use extended variable syntax, the attribute name must consist
+    of only letters, numbers, and underscores.
 
     == Example Test ==
     You can run this test because it uses a public web service.

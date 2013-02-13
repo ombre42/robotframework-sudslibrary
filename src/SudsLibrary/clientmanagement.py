@@ -52,7 +52,8 @@ class _ClientManagementKeywords(object):
     def switch_soap_client(self, index_or_alias):
         """Switches between clients using index or alias.
 
-        Index is returned from `Create Client` and alias can be given to it.
+        Index is returned from `Create Soap Client` and alias can be given to
+        it.
 
         Example:
         | Create Soap Client  | http://localhost:8080/Billing?wsdl   | Billing   |
