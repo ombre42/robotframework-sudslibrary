@@ -6,7 +6,7 @@ Introduction
 
 This library is in a beta development stage.
 
-See the working `Keyword Documentation`_ for more information about using the library.
+See the `Keyword Documentation`_ for more information about using the library.
 
 Installation
 ------------
@@ -14,6 +14,8 @@ Installation
 You can install SudsLibrary using pip, with the following command
 
   ``pip install robotframework-sudslibrary``
+  
+Binary installers are available on `PyPI`_, but they do not include Suds, a required package.
 
 Installation Using a Fork of Suds
 ---------------------------------
@@ -46,3 +48,4 @@ IronPython Support
 Support under IronPython is unkown -- it has not been tested.
 
 .. _Keyword Documentation: http://ombre42.github.com/robotframework-sudslibrary/doc/SudsLibrary.html
+.. _PyPI: https://pypi.python.org/pypi/robotframework-sudslibrary/
