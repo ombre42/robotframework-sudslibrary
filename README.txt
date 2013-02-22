@@ -3,7 +3,8 @@ Suds library for Robot Framework
 
 Introduction
 ------------
-
+SudsLibrary is a library for functional testing of SOAP-based web services.
+SudsLibrary is based on Suds, a dynamic SOAP 1.1 client.
 This library is in a beta development stage.
 
 See the `Keyword Documentation`_ for more information about using the library.
