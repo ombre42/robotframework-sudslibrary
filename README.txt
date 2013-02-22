@@ -41,4 +41,8 @@ See these posts on getting Java to trust all certificates:
 1. http://tech.pedersen-live.com/2010/10/trusting-all-certificates-in-jython/
 2. http://jython.xhaus.com/installing-an-all-trusting-security-provider-on-java-and-jython/
 
+IronPython Support
+------------------
+Support under IronPython is unkown -- it has not been tested.
+
 .. _Keyword Documentation: http://ombre42.github.com/robotframework-sudslibrary/doc/SudsLibrary.html
