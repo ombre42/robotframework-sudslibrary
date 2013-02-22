@@ -32,8 +32,9 @@ class _ProxyKeywords(object):
 
         If there is only one service specified then `service` is ignored.
         `service` and `port` can be either by name or index. If only `port` or
-        `service` need to be specified, leave the other one blank. The index
-        is the order of appearence in the WSDL starting with 0.
+        `service` need to be specified, leave the other one ${None} or
+        ${EMPTY}. The index is the order of appearence in the WSDL starting
+        with 0.
 
         Returns a Python object graph or SOAP envelope as a XML string
         depending on the client options.
