@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from os.path import abspath, dirname, join
 from robot.utils import ConnectionCache
+from .version import VERSION
 from .monkeypatches import *
 from .factory import _FactoryKeywords
 from .clientmanagement import _ClientManagementKeywords
@@ -23,9 +23,6 @@ from .soaplogging import _SoapLoggingKeywords
 from suds import null
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
-
-THIS_DIR = dirname(abspath(__file__))
-execfile(join(THIS_DIR, 'version.py'))
 
 __version__ = VERSION
 
