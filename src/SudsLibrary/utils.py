@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from robot.libraries.BuiltIn import BuiltIn
+from robot import utils
 
 
 # assumed that no WSDL will have a service or port named "1", etc.
@@ -24,4 +24,9 @@ def parse_index(value):
 
 
 def to_bool(item):
-    return BuiltIn().convert_to_boolean(item)
+    if isinstance(item, basestring):
+        if utils.eq(item, 'True'):
+            return True
+        if utils.eq(item, 'False'):
+            return False
+    return bool(item)
