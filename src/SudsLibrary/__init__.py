@@ -47,8 +47,14 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     When Suds digests a WSDL, it creates dynamic types to represent the complex
     types defined by a WSDL or its imports. These types are listed in the
     output of `Create Soap Client`. WSDL objects are used as method arguments,
-    attribute values of other WSDL objects, and return values.
-    `Create Wsdl Object` is used to create instances of WSDL object types.
+    attribute values of other WSDL objects, and return values. `Create Wsdl
+    Object` is used to create instances of WSDL object types. To see what the
+    structure of a WSDL object is, you can do this:
+    | ${obj}=        | Create Wsdl Object | someObject |
+    | ${obj as str}= | Convert To String  |            |
+    | Log            | ${obj as str}      |            |
+    It may also help to use a tool such as Eclipse or SoapUI to comprehend the
+    structures.
 
     === Getting WSDL Object Attributes ===
     Getting a WSDL object's attribute value may be done with `Get Wsdl Object
@@ -70,9 +76,11 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     of only letters, numbers, and underscores.
 
     == Example Test ==
-    You can run this test because it uses a public web service.
+    The following simple example demonstrates verifying the return value using
+    keywords in this library and in `BuiltIn` and `Collections` libraries. You
+    can run this test because it uses a public web service.
 
-    | Create Client              | http://www.webservicex.net/Statistics.asmx?WSDL |               |              |
+    | Create Soap Client         | http://www.webservicex.net/Statistics.asmx?WSDL |               |              |
     | ${dbl array}=              | Create Wsdl Object                              | ArrayOfDouble |              |
     | Append To List             | ${dbl array.double}                             | 2.0           |              |
     | Append To List             | ${dbl array.double}                             | 3.0           |              |
@@ -100,7 +108,8 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     |     </s:sequence>
     |   </s:complexType>
     | </s:element>
-    The definition of this method appears in the output of Create Client as:
+    The definition of this method appears in the output of Create Soap Client
+    as:
     | GetStatistics(ArrayOfDouble X, )
 
     == Passing Explicit NULL Values ==

@@ -159,7 +159,7 @@ class _OptionsKeywords(object):
         """Adds an import be used in the next client.
 
         Doctor imports are applied to the _next_ client created with
-        `Create Client`. Doctor imports are necessary when references are
+        `Create Soap Client`. Doctor imports are necessary when references are
         made in one schema to named objects defined in another schema without
         importing it. Use `location` to specify the location to download the
         schema file. `filters` should be either a comma-delimited list of
@@ -183,7 +183,7 @@ class _OptionsKeywords(object):
         location. If the schemaLocation is present and incorrect, this will
         not override that. Bound schemas are shared amongst all instances of
         SudsLibrary. Schemas should be bound if necessary before `Add Doctor
-        Import` or `Create Client` where appropriate.
+        Import` or `Create Soap Client` where appropriate.
         """
         BasicImport.bind(namespace, location)
 
