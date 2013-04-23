@@ -51,10 +51,10 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     Object` is used to create instances of WSDL object types. To see what the
     structure of a WSDL object is, you can do this:
     | ${obj}=        | Create Wsdl Object | someObject |
-    | ${obj as str}= | Convert To String  |            |
+    | ${obj as str}= | Convert To String  | ${obj}     |
     | Log            | ${obj as str}      |            |
-    It may also help to use a tool such as Eclipse or SoapUI to comprehend the
-    structures.
+    The same technique can be used to analyze a response object. It may also
+    help to use a tool such as Eclipse or SoapUI to comprehend the structures.
 
     === Getting WSDL Object Attributes ===
     Getting a WSDL object's attribute value may be done with `Get Wsdl Object
