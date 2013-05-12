@@ -20,6 +20,7 @@ from .clientmanagement import _ClientManagementKeywords
 from .options import _OptionsKeywords
 from .proxy import _ProxyKeywords
 from .soaplogging import _SoapLoggingKeywords
+from .wsse import _WsseKeywords
 from suds import null
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
@@ -28,7 +29,8 @@ __version__ = VERSION
 
 
 class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
-                  _OptionsKeywords, _ProxyKeywords, _SoapLoggingKeywords):
+                  _OptionsKeywords, _ProxyKeywords, _SoapLoggingKeywords,
+                  _WsseKeywords):
     """SudsLibrary is a library for functional testing of SOAP-based web
     services.
 

@@ -1,0 +1,55 @@
+*** Settings ***
+Suite Setup       Start Services
+Suite Teardown    Stop Services
+Test Setup        Create Soap Client    ${TEST WSDL URL}
+Library           XML
+Library           Collections
+Library           SudsLibrary
+Library           ../resources/TestWebServices.py
+Library           ../resources/Util.py
+
+*** Variables ***
+${TEST WSDL URL}    http://localhost:8080/TestService/soap11/description
+
+*** Test Cases ***
+Timestamp
+    Apply Security Timestamp    30 sec
+    Call Soap Method    theAnswer
+    ${created}    ${expires}=    Get Created and Expires
+    Timestamp Duration Should Be    30
+    Apply Security Timestamp    5s
+    Call Soap Method    theAnswer
+    Timestamp Duration Should Be    5
+
+Replace Existing Timestamp
+    [Documentation]    Existing Security object should be kept and other Timestamp instances removed
+    ${date}=    Evaluate    suds.wsse    suds
+    ${security}=    Call Method    ${date}    Security
+    ${timestamp}=    Call Method    ${date}    Timestamp    ${5}
+    Append To List    ${security.tokens}    ${timestamp}
+    ${sudslib}=    Get Library Instance    SudsLibrary
+    ${sudslib._client().options.wsse}    Set Variable    ${security}
+    Call Soap Method    theAnswer
+    Timestamp Duration Should Be    5
+    Apply Security Timestamp    10 sec
+    Call Soap Method    theAnswer
+    Timestamp Duration Should Be    10
+    Should Be Equal    ${sudslib._client().options.wsse}    ${security}
+
+Default Timestamp Duration
+    Apply Security Timestamp
+    Call Soap Method    theAnswer
+    Timestamp Duration Should Be    90
+
+*** Keywords ***
+Timestamp Duration Should Be
+    [Arguments]    ${difference}
+    ${created}    ${expires}=    Get Created and Expires
+    ${actual difference}=    Xml Datetime Difference    ${created}    ${expires}
+    Should Be Equal As Numbers    ${actual difference}    ${difference}
+
+Get Created and Expires
+    ${xml}=    Get Last Sent
+    ${created}=    Get Element Text    ${xml}    Header/Security/Timestamp/Created
+    ${expires}=    Get Element Text    ${xml}    Header/Security/Timestamp/Expires
+    [Return]    ${created}    ${expires}
