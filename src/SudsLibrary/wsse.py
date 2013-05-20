@@ -12,9 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .utils import *
 from suds.wsse import Security
 from suds.wsse import Timestamp
+from suds.wsse import UsernameToken
+from suds.sax.element import Element
+from suds.sax.date import UTC
+from random import random
+from hashlib import sha1
 import robot
+
+
+PASSWORDTEXT_TYPE = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText'
+BASE64_ENC_TYPE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+WSSENS = \
+    ('wsse',
+     'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd')
+WSUNS = \
+    ('wsu',
+     'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd')
 
 
 class AutoTimestamp(Timestamp):
@@ -28,10 +44,55 @@ class AutoTimestamp(Timestamp):
         return Timestamp.xml(self)
 
 
+class AutoUsernameToken(UsernameToken):
+
+    def __init__(self, username=None, password=None, setcreated=False,
+                 setnonce=False, digest=False):
+        if digest:
+            raise NotImplementedError()
+        UsernameToken.__init__(self, username, password)
+        self.autosetcreated = setcreated
+        self.autosetnonce = setnonce
+
+    def setnonce(self, text=None):
+        if text is None:
+            hash = sha1()
+            hash.update(str(random()))
+            hash.update(str(UTC()))
+            self.nonce = hash.hexdigest()
+        else:
+            self.nonce = text
+
+    def xml(self):
+        root = Element('UsernameToken', ns=WSSENS)
+        u = Element('Username', ns=WSSENS)
+        u.setText(self.username)
+        root.append(u)
+        if self.password is not None:
+            p = Element('Password', ns=WSSENS)
+            p.setText(self.password)
+            p.set('Type', PASSWORDTEXT_TYPE)
+            root.append(p)
+        if self.autosetnonce:
+            self.setnonce()
+        if self.nonce is not None:
+            n = Element('Nonce', ns=WSSENS)
+            n.setText(self.nonce)
+            n.set('EncodingType', BASE64_ENC_TYPE)
+            root.append(n)
+        if self.autosetcreated:
+            self.setcreated()
+        if self.created:
+            n = Element('Created', ns=WSUNS)
+            n.setText(str(UTC(self.created)))
+            root.append(n)
+        return root
+
+
 class _WsseKeywords(object):
 
     def apply_security_timestamp(self, duration='90 seconds'):
-        """Applies a timestamp element to future requests valid for the given `duration`.
+        """Applies a Timestamp element to future requests valid for the given `duration`.
 
         The SOAP header will contain a Timestamp element as specified in the
         WS-Security extension. The Created and Expires values are updated
@@ -45,6 +106,21 @@ class _WsseKeywords(object):
         wsse.tokens = [x for x in wsse.tokens if not isinstance(x, Timestamp)]
         wsse.tokens.insert(0, AutoTimestamp(validity))
         self._client().options.wsse = wsse
+
+    def apply_username_token(self, username, password=None, setcreated=False, setnonce=False):
+        """Applies a UsernameToken element to future requests.
+
+        The SOAP header will contain a UsernameToken element as specified in
+        the WS-Security extension. The password type is PasswordText (plain
+        text). The Created and Nonce values, if enabled, are generated
+        automatically and updated every time a request is made."""
+        setcreated = to_bool(setcreated)
+        setnonce = to_bool(setnonce)
+        token = AutoUsernameToken(username, password, setcreated, setnonce)
+        wsse = self._get_wsse()
+        wsse.tokens = [x for x in wsse.tokens if not isinstance(x, UsernameToken)]
+        wsse.tokens.append(token)
+        self._client().set_options(wsse=wsse)
 
     # private
 

@@ -1,16 +1,10 @@
 *** Settings ***
 Suite Setup       Start Services
 Suite Teardown    Stop Services
-Library           XML
-Library           Collections
-Library           SudsLibrary
-Library           ../resources/TestWebServices.py
-Library           ../resources/Loggers.py
+Resource          resource.txt
 
 *** Variables ***
-${TEST WSDL URL}    http://localhost:8080/TestService/soap11/description
 ${JOHN PARSONS}    <?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="urn:TestService" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><SOAP-ENV:Body SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><ns:returnComplexTypeResponse><result><first-name>John</first-name><last-name>Parsons</last-name></result></ns:returnComplexTypeResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
-${CALCULATOR WSDL URL}    http://localhost:8080/Calculator/soap11/description
 
 *** Test Cases ***
 Several Ways To Handle Plurality

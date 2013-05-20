@@ -2,20 +2,12 @@
 Suite Setup       Start Services
 Suite Teardown    Stop Services
 Test Setup        Create Soap Client    ${TEST WSDL URL}
-Library           XML
-Library           Collections
-Library           SudsLibrary
-Library           ../resources/TestWebServices.py
-Library           ../resources/Util.py
-
-*** Variables ***
-${TEST WSDL URL}    http://localhost:8080/TestService/soap11/description
+Resource          resource.txt
 
 *** Test Cases ***
 Timestamp
     Apply Security Timestamp    30 sec
     Call Soap Method    theAnswer
-    ${created}    ${expires}=    Get Created and Expires
     Timestamp Duration Should Be    30
     Apply Security Timestamp    5s
     Call Soap Method    theAnswer
@@ -41,15 +33,119 @@ Default Timestamp Duration
     Call Soap Method    theAnswer
     Timestamp Duration Should Be    90
 
+Username and Password
+    Call Soap Method    theAnswer
+    Username and Password Should Be Absent
+    Apply Username Token    root    secret
+    Call Soap Method    theAnswer
+    Username and Password Should Be    root    secret
+    Apply Username Token    super    letmein
+    Call Soap Method    theAnswer
+    Username and Password Should Be    super    letmein
+
+Password Has Type
+    [Documentation]    Optional in the specification, but some endpoints require it anyways so always send it.
+    Apply Username Token    root    secret
+    Call Soap Method    theAnswer
+    ${xml}=    Get Last Sent
+    Element Attribute Should Be    ${xml}    Type    http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText    Header/Security/UsernameToken/Password
+
+Blank Password
+    Apply Username Token    root    ${EMPTY}
+    Call Soap Method    theAnswer
+    Username and Password Should Be    root    ${EMPTY}
+
+UsernameToken: Created
+    Apply Username Token    user
+    Call Soap Method    theAnswer
+    Created Should Be Absent
+    Apply Username Token    user    setcreated=True
+    Call Soap Method    theAnswer
+    ${first created}=    Get Created In UsernameToken
+    ${diff}=    Xml Datetime Difference    ${first created}
+    Should Be True    ${diff} < 2
+    Call Soap Method    theAnswer
+    ${second created}=    Get Created In UsernameToken
+    Should Not Be Equal    ${first created}    ${second created}
+
+Nonce
+    Apply Username Token    user
+    Call Soap Method    theAnswer
+    Nonce Should Be Absent
+    Apply Username Token    user    setnonce=True
+    Call Soap Method    theAnswer
+    Nonce Should Be Present
+    ${first nonce}=    Get Nonce
+    Call Soap Method    theAnswer
+    ${second nonce}=    Get Nonce
+    Should Not Be Equal    ${first nonce}    ${second nonce}
+
+Nonce Has EncodingType
+    Apply Username Token    user    setnonce=True
+    Call Soap Method    theAnswer
+    ${xml}=    Get Last Sent
+    Element Attribute Should Be    ${xml}    EncodingType    http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary    Header/Security/UsernameToken/Nonce
+
+Username No Password
+    Apply Username Token    user
+    Call Soap Method    theAnswer
+    Password Should Be Absent
+
+Timestamp and UsernameToken
+    Apply Security Timestamp
+    Apply Username Token    user
+    Call Soap Method    theAnswer
+    ${xml}=    Get Last Sent
+    Element Should Exist    ${xml}    Header/Security/Timestamp
+    Element Should Exist    ${xml}    Header/Security/UsernameToken
+
 *** Keywords ***
-Timestamp Duration Should Be
-    [Arguments]    ${difference}
-    ${created}    ${expires}=    Get Created and Expires
-    ${actual difference}=    Xml Datetime Difference    ${created}    ${expires}
-    Should Be Equal As Numbers    ${actual difference}    ${difference}
+Created Should Be Absent
+    ${xml}=    Get Last Sent
+    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Created
+
+Get Created In UsernameToken
+    ${xml}=    Get Last Sent
+    ${created}=    Get Element Text    ${xml}    Header/Security/UsernameToken/Created
+    [Return]    ${created}
 
 Get Created and Expires
     ${xml}=    Get Last Sent
     ${created}=    Get Element Text    ${xml}    Header/Security/Timestamp/Created
     ${expires}=    Get Element Text    ${xml}    Header/Security/Timestamp/Expires
     [Return]    ${created}    ${expires}
+
+Get Nonce
+    ${xml}=    Get Last Sent
+    ${nonce}=    Get Element Text    ${xml}    Header/Security/UsernameToken/Nonce
+    [Return]    ${nonce}
+
+Nonce Should Be Absent
+    ${xml}=    Get Last Sent
+    ${first nonce}=    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Nonce
+
+Nonce Should Be Present
+    ${xml}=    Get Last Sent
+    ${first nonce}=    Get Element Text    ${xml}    Header/Security/UsernameToken/Nonce
+    Should Not Be Empty    ${first nonce}
+
+Password Should Be Absent
+    ${xml}=    Get Last Sent
+    ${first nonce}=    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Password
+
+Timestamp Duration Should Be
+    [Arguments]    ${difference}
+    ${created}    ${expires}=    Get Created and Expires
+    ${actual difference}=    Xml Datetime Difference    ${created}    ${expires}
+    Should Be Equal As Numbers    ${actual difference}    ${difference}
+
+Username and Password Should Be
+    [Arguments]    ${username}    ${password}
+    ${xml}=    Get Last Sent
+    Element Text Should Be    ${xml}    ${username}    Header/Security/UsernameToken/Username
+    Element Text Should Be    ${xml}    ${password}    Header/Security/UsernameToken/Password
+
+Username and Password Should Be Absent
+    ${xml}=    Get Last Sent
+    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Username
+    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Password

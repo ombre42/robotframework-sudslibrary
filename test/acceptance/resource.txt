@@ -1,0 +1,11 @@
+*** Settings ***
+Library           XML
+Library           Collections
+Library           SudsLibrary
+Library           ../resources/TestWebServices.py
+Library           ../resources/Loggers.py
+Library           ../resources/Util.py
+
+*** Variables ***
+${CALCULATOR WSDL URL}    http://localhost:8080/Calculator/soap11/description
+${TEST WSDL URL}    http://localhost:8080/TestService/soap11/description
