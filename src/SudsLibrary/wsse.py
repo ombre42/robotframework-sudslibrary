@@ -105,7 +105,7 @@ class _WsseKeywords(object):
         wsse = self._get_wsse()
         wsse.tokens = [x for x in wsse.tokens if not isinstance(x, Timestamp)]
         wsse.tokens.insert(0, AutoTimestamp(validity))
-        self._client().options.wsse = wsse
+        self._client().set_options(wsse=wsse)
 
     def apply_username_token(self, username, password=None, setcreated=False, setnonce=False):
         """Applies a UsernameToken element to future requests.
