@@ -14,6 +14,7 @@
 
 from .utils import *
 from suds.wsse import Security
+from suds.wsse import Token
 from suds.wsse import Timestamp
 from suds.wsse import UsernameToken
 from suds.sax.element import Element
@@ -36,12 +37,11 @@ WSUNS = \
 class AutoTimestamp(Timestamp):
 
     def __init__(self, validity=90):
-        Timestamp.__init__(self, validity)
+        Token.__init__(self)
         self.validity = validity
 
     def xml(self):
-        Timestamp.__init__(self, self.validity)
-        return Timestamp.xml(self)
+        return Timestamp(self.validity).xml()
 
 
 class AutoUsernameToken(UsernameToken):
