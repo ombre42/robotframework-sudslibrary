@@ -17,19 +17,26 @@ You can install SudsLibrary using pip, with the following command
   
 Binary installers are available on `PyPI`_, but they do not include Suds, a required package.
 
+Getting Help
+------------
+The `user group for Robot Framework`_ is the best place to get help. Consider including in the post:
+
+- Publicly accessible URL to the WSDL or an attachment containing the WSDL
+- Log file as attachment or an excerpt of it
+
 Installation Using a Fork of Suds
 ---------------------------------
 
 Development on the Suds project has appeared to cease. There are more than one forks of Suds that you may want to use. SudsLibrary was only tested with suds-jurko and the official suds package.
 Here are three ways to setup for using a fork:
 
-1. If the fork is in PyPI:
-Set the environmental variable SUDS_LIBRARY_SUDS_REQUIREMENT to a valid requirement string, such as "suds-somefork > 0.5". When SudsLibrary is installed, the fork will be installed from PyPi to satisfy the requirement.
+#. If the fork is in PyPI:
+    Set the environmental variable SUDS_LIBRARY_SUDS_REQUIREMENT to a valid requirement string, such as "suds-somefork > 0.5". When SudsLibrary is installed, the fork will be installed from PyPi to satisfy the requirement.
 
-2. If the fork is not in PyPI or you have already installed it:
-Install the fork prior to SudsLibrary. Then set the environmental variable SUDS_LIBRARY_SUDS_REQUIREMENT to a space and install SudsLibrary. This essentially removes the installation dependency on Suds.
+#. If the fork is not in PyPI or you have already installed it:
+    Install the fork prior to SudsLibrary. Then set the environmental variable SUDS_LIBRARY_SUDS_REQUIREMENT to a space and install SudsLibrary. This essentially removes the installation dependency on Suds.
 
-3. Uninstall suds after installing SudsLibrary. Then install a fork.
+#. Uninstall suds after installing SudsLibrary. Then install a fork.
 
 Jython Support
 --------------
@@ -49,3 +56,4 @@ Support under IronPython is unkown -- it has not been tested.
 
 .. _Keyword Documentation: http://ombre42.github.com/robotframework-sudslibrary/doc/SudsLibrary.html
 .. _PyPI: https://pypi.python.org/pypi/robotframework-sudslibrary/
+.. _user group for Robot Framework: http://groups.google.com/group/robotframework-users
