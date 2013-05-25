@@ -296,4 +296,53 @@ Set WSDL Object Attribute
     Run Keyword And Expect Error    AttributeError: *Person*has no attribute 'badname'    Get Wsdl Object Attribute    ${person}    badname
     Run Keyword And Expect Error    ValueError: Object must be a WSDL object (suds.sudsobject.Object).    Set Wsdl Object Attribute    ${first name}    name    bob
 
+Soap Timeout
+    [Documentation]    LOG 4 INFO SOAP timeout set to 30 seconds
+    Create Soap Client    ${TEST WSDL URL}
+    Set Soap Timeout    1 ms
+    Run Keyword And Expect Error    timeout: timed out    Call Soap Method    theAnswer
+    Set Soap Timeout    30s
+    Call Soap Method    theAnswer
+
+Default Socket Timeout Is Restored
+    [Documentation]    When running in an interpreter with version < 2.6, suds changes the default socket timeout. Make sure it is restored so as to not interfere with other network code.
+    [Setup]    Save And Set Global Timeout and urllib2 Version
+    Create Soap Client    ${TEST WSDL URL}
+    Set Global Socket Timeout    ${42}
+    Call Soap Method    theAnswer
+    Default Socket Timeout Should Be    ${42}
+    Run Keyword And Ignore Error    Call Soap Method    theAnswer    badArg
+    Default Socket Timeout Should Be    ${42}
+    [Teardown]    Restore Global Timeout And urllib2 Version
+
+Timeout Set On Create
+    Create Soap Client    ${TEST WSDL URL}    timeout=45 sec
+    ${sl}=    Get Library Instance    SudsLibrary
+    Should Be Equal As Numbers    ${sl._client().options.timeout}    45
+
 *** Keywords ***
+Default Socket Timeout Should Be
+    [Arguments]    ${timeout}
+    ${timeout after}=    Evaluate    socket.getdefaulttimeout()    socket
+    Should Be Equal As Numbers    ${timeout after}    ${timeout}
+
+Restore Global Timeout And urllib2 Version
+    ${sl}=    Get Library Instance    SudsLibrary
+    Log    ${sl._global_timeout}    # sanity check
+    ${sl._global_timeout}=    Set Variable    ${old global timeout}
+    ${u2}=    Evaluate    urllib2    urllib2
+    ${u2.__version__}=    Set Variable    ${old u2ver}
+
+Save And Set Global Timeout and urllib2 Version
+    ${sl}=    Get Library Instance    SudsLibrary
+    Log    ${sl._global_timeout}    # sanity check
+    Set Test Variable    ${old global timeout}    ${sl._global_timeout}
+    ${sl._global_timeout}=    Set Variable    ${True}
+    ${u2}=    Evaluate    urllib2    urllib2
+    Set Test Variable    ${old u2ver}    ${u2.__version__}
+    ${u2.__version__}=    Set Variable    2.5
+
+Set Global Socket Timeout
+    [Arguments]    ${timeout}
+    ${socket}=    Evaluate    socket    socket
+    Call Method    ${socket}    setdefaulttimeout    ${timeout}

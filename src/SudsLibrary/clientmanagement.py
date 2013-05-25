@@ -23,7 +23,7 @@ from .utils import *
 
 class _ClientManagementKeywords(object):
 
-    def create_soap_client(self, url_or_path, alias=None, autoblend=False):
+    def create_soap_client(self, url_or_path, alias=None, autoblend=False, timeout='90 seconds'):
         """Loads a WSDL from the given URL/path and creates a Suds SOAP client.
 
         Returns the index of this client instance which can be used later to
@@ -36,6 +36,9 @@ class _ClientManagementKeywords(object):
         Autoblend ensures that the schema(s) defined within the WSDL import
         each other.
 
+        `timeout` sets the timeout for SOAP requests and must be given in
+        Robot Framework's time format (e.g. '1 minute', '2 min 3 s', '4.5').
+
         | Create Soap Client | http://localhost:8080/ws/Billing.asmx?WSDL |
         | Create Soap Client | ${CURDIR}/../wsdls/tracking.wsdl |
         """
@@ -47,7 +50,9 @@ class _ClientManagementKeywords(object):
             self._log_imports()
             kwargs['doctor'] = ImportDoctor(*imports)
         client = Client(url, **kwargs)
-        return self._add_client(client, alias)
+        index = self._add_client(client, alias)
+        self._set_soap_timeout(timeout)
+        return index
 
     def switch_soap_client(self, index_or_alias):
         """Switches between clients using index or alias.

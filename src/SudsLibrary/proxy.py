@@ -1,4 +1,4 @@
-# Copyright 2012 Kevin Ormbrek
+# Copyright 2013 Kevin Ormbrek
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 from suds import WebFault
 from .utils import *
+import socket
 
 
 class _ProxyKeywords(object):
@@ -91,6 +92,11 @@ class _ProxyKeywords(object):
     def _backup_options(self):
         options = self._client().options
         self._old_options = dict([[n, getattr(options, n)] for n in ('service', 'port')])
+        if self._global_timeout:
+            self._old_timeout = socket.getdefaulttimeout()
 
     def _restore_options(self):
         self._client().set_options(**self._old_options)
+        # restore the default socket timeout because suds does not
+        if self._global_timeout:
+            socket.setdefaulttimeout(self._old_timeout)

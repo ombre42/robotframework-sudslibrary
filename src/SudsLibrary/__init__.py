@@ -1,4 +1,4 @@
-# Copyright 2012 Kevin Ormbrek
+# Copyright 2013 Kevin Ormbrek
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ from .wsse import _WsseKeywords
 from suds import null
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
+import urllib2
+import traceback
 
 __version__ = VERSION
 
@@ -166,6 +168,16 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
         self._cache = ConnectionCache(no_current_msg='No current client')
         self._imports = []
         self._logger = logger
+        self._global_timeout = True
+        try:
+            part = urllib2.__version__.split('.', 1)
+            n = float('.'.join(part))
+            if n >= 2.6:
+                self._global_timeout = False
+        except Exception, e:
+            raise e
+            self._logger.warn("Failed to get urllib2's version")
+            self._logger.debug(traceback.format_exc())
         try:  # exception if Robot is not running
             BuiltIn().set_global_variable("${SUDS_NULL}", null())
         except:

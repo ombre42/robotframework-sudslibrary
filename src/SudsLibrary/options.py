@@ -1,4 +1,4 @@
-# Copyright 2012 Kevin Ormbrek
+# Copyright 2013 Kevin Ormbrek
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from suds.transport.https import HttpAuthenticated
 from suds.transport.https import WindowsHttpAuthenticated
 from suds.transport.http import HttpAuthenticated as AlwaysSendTransport
 from .utils import *
+import robot
 
 
 class _OptionsKeywords(object):
@@ -187,8 +188,25 @@ class _OptionsKeywords(object):
         """
         BasicImport.bind(namespace, location)
 
+    def set_soap_timeout(self, timeout):
+        """Sets the timeout for SOAP requests.
+
+        `timeout` must be given in Robot Framework's time format (e.g.
+        '1 minute', '2 min 3 s', '4.5'). The default timeout is 90 seconds.
+
+        Example:
+        | Set Soap Timeout | 3 min |
+        """
+        self._set_soap_timeout(timeout)
+        timestr = format_robot_time(timeout)
+        self._logger.info("SOAP timeout set to %s" % timestr)
+
     # private
 
     def _set_boolean_option(self, name, value):
         value = to_bool(value)
         self._client().set_options(**{name: value})
+
+    def _set_soap_timeout(self, timeout):
+        timeout_in_secs = robot.utils.timestr_to_secs(timeout)
+        self._client().set_options(timeout=timeout_in_secs)

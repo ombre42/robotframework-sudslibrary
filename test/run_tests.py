@@ -13,6 +13,7 @@ ROBOT_ARGS = [
     '--report', 'none',
     '--log', 'none',
     '--pythonpath', testenv.SRC_DIR,
+    '--debugfile', join(testenv.RESULTS_DIR, 'syslog.txt')
 ]
 
 def acceptance_tests(args):
