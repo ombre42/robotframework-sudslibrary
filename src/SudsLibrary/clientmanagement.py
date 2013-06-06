@@ -39,6 +39,7 @@ class _ClientManagementKeywords(object):
         `timeout` sets the timeout for SOAP requests and must be given in
         Robot Framework's time format (e.g. '1 minute', '2 min 3 s', '4.5').
 
+        Examples:
         | Create Soap Client | http://localhost:8080/ws/Billing.asmx?WSDL |
         | Create Soap Client | ${CURDIR}/../wsdls/tracking.wsdl |
         """

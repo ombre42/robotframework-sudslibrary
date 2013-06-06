@@ -100,6 +100,9 @@ class _WsseKeywords(object):
 
         `duration` must be given in Robot Framework's time format (e.g.
         '1 minute', '2 min 3 s', '4.5').
+
+        Example:
+        | Apply Security Timestamp | 5 min |
         """
         validity = robot.utils.timestr_to_secs(duration)
         wsse = self._get_wsse()
@@ -113,7 +116,11 @@ class _WsseKeywords(object):
         The SOAP header will contain a UsernameToken element as specified in
         the WS-Security extension. The password type is PasswordText (plain
         text). The Created and Nonce values, if enabled, are generated
-        automatically and updated every time a request is made."""
+        automatically and updated every time a request is made.
+
+        Example:
+        | Apply Username Token | ying | myPa$$word |
+        """
         setcreated = to_bool(setcreated)
         setnonce = to_bool(setnonce)
         token = AutoUsernameToken(username, password, setcreated, setnonce)

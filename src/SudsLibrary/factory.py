@@ -18,7 +18,12 @@ from suds.sudsobject import Object as SudsObject
 class _FactoryKeywords(object):
 
     def set_wsdl_object_attribute(self, object, name, value):
-        """Sets the attribute of a WSDL object."""
+        """Sets the attribute of a WSDL object.
+
+        Example:
+        | ${order search request}=  | Create Wsdl Object      | OrderSearchRequest |      |
+        | Set Wsdl Object Attribute | ${order search request} | id                 | 4065 |
+        """
         self._assert_is_suds_object(object)
         getattr(object, name)
         setattr(object, name, value)
@@ -29,6 +34,10 @@ class _FactoryKeywords(object):
         Extendend variable syntax may be used to access attributes; however,
         some WSDL objects may have attribute names that are illegal in Python,
         necessitating this keyword.
+
+        Example:
+        | ${sale record}= | Call Soap Method          | getLastSale    |       |
+        | ${price}=       | Get Wsdl Object Attribute | ${sale record} | Price |
         """
         self._assert_is_suds_object(object)
         return getattr(object, name)
@@ -37,7 +46,7 @@ class _FactoryKeywords(object):
         """Creates a WSDL object of the specified `type`.
 
         Requested `type` must be defined in the WSDL, in an import specified
-        by the WSDL, or with `Add Doctor Import`.
+        by the WSDL, or with `Add Doctor Import`. `type` is case sensitive.
 
         Example:
         | ${contact}=               | Create Wsdl Object | Contact |              |

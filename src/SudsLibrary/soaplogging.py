@@ -69,8 +69,10 @@ class _SoapLoggingKeywords(object):
         By default, the message sent and received is logged at level INFO,
         pretty-formatted with an indent of 2 spaces per level. Setting `log`
         to false will disable logging, reducing the size of the log. Boolean
-        option `prettyxml` controls whether the XML is pretty-formatted. `indent` should be the
-        number of spaces to indent per level. Returns the current value of log.
+        option `prettyxml` controls whether the XML is pretty-formatted.
+        `indent` should be the number of spaces to indent per level. Leaving
+        `prettyxml` or `indent` at the default value of None will preserve the
+        previous settings. Returns the current value of log.
 
         Examples:
         | ${old log value} | Set Soap Logging | False    |   |

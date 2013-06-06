@@ -55,6 +55,8 @@ class _OptionsKeywords(object):
     def set_headers(self, *dict_or_key_value_pairs):
         """Sets _extra_ http headers to send in future requests.
 
+        For HTTP headers; not to be confused with the SOAP header element.
+
         Example:
         | Set Headers | X-Requested-With  | autogen          | # using key-value pairs |
         or using a dictionary:
@@ -77,12 +79,15 @@ class _OptionsKeywords(object):
 
         Example:
         | ${auth header}=           | Create Wsdl Object | AuthHeader           |          |
-        | Set Wsdl Object Attribute | ${auth header}     | UserName             | gcarlson |
+        | Set Wsdl Object Attribute | ${auth header}     | UserID               | gcarlson |
         | Set Wsdl Object Attribute | ${auth header}     | Password             | heyOh    |
         | Set Soap Headers          | ${auth header}     | # using WSDL object  |          |
         or using a dictionary:
         | ${auth dict}=             | Create Dictionary  | UserName             | gcarlson  | Password | heyOh |
         | Set Soap Headers          | ${auth dict}       | # using a dictionary |           |          |       |
+
+        For setting WS-Security elements in the SOAP header, see
+        `Apply Username Token` and `Apply Security Timestamp`.
         """
         self._client().set_options(soapheaders=headers)
 
@@ -135,6 +140,9 @@ class _OptionsKeywords(object):
         comma-delimited list of methods names or an iterable (e.g. a list). If
         no methods names are given, then sets the location for all methods of
         the service(s).
+
+        Example:
+        | Set Location | http://localhost:8080/myWS |
         """
         wsdl = self._client().wsdl
         service_count = len(wsdl.services)
@@ -164,9 +172,10 @@ class _OptionsKeywords(object):
         made in one schema to named objects defined in another schema without
         importing it. Use `location` to specify the location to download the
         schema file. `filters` should be either a comma-delimited list of
-        namespaces or an iterable (e.g. a list). The following example would
-        import the SOAP encoding schema into only the namespace
-        http://some/namespace/A if it is not already imported:
+        namespaces or an iterable (e.g. a list).
+
+        The following example would import the SOAP encoding schema into only
+        the namespace http://some/namespace/A if it is not already imported:
         | Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | filters=http://some/namespace/A |
         """
         if isinstance(filters, basestring):

@@ -39,6 +39,10 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     SudsLibrary is based on [https://fedorahosted.org/suds/|Suds], a dynamic
     SOAP 1.1 client.
 
+    == Case Sensitivy in SudsLibrary ==
+    Many things in the world of SOAP are case-sensitive. This includes method
+    names, WSDL object names and attributes, and service or port names.
+
     == Creating and Configuring a Client ==
     If necessary, use keywords `Bind Schema To Location` or `Add Doctor
     Import`. These are rarely needed. Next, `Create Soap Client` to create a Suds
