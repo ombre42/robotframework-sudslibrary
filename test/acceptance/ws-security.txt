@@ -44,11 +44,15 @@ Username and Password
     Username and Password Should Be    super    letmein
 
 Password Has Type
-    [Documentation]    Optional in the specification, but some endpoints require it anyways so always send it.
+    [Documentation]    Type is optional in the WS-Security specification when using PasswordText, but it is mandatory in WS-I's Basic Security Profile; therefore it should always be sent.
     Apply Username Token    root    secret
     Call Soap Method    theAnswer
     ${xml}=    Get Last Sent
     Element Attribute Should Be    ${xml}    Type    http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText    Header/Security/UsernameToken/Password
+    Apply Username Token    root    secret    digest=True
+    Call Soap Method    theAnswer
+    ${xml}=    Get Last Sent
+    Element Attribute Should Be    ${xml}    Type    http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest    Header/Security/UsernameToken/Password
 
 Blank Password
     Apply Username Token    root    ${EMPTY}
@@ -81,6 +85,7 @@ Nonce
     Should Not Be Equal    ${first nonce}    ${second nonce}
 
 Nonce Has EncodingType
+    [Documentation]    EncodingType is optional in the WS-Security specification when using PasswordText, but it is mandatory in WS-I's Basic Security Profile; therefore it should always be sent.
     Apply Username Token    user    setnonce=True
     Call Soap Method    theAnswer
     ${xml}=    Get Last Sent
@@ -98,6 +103,27 @@ Timestamp and UsernameToken
     ${xml}=    Get Last Sent
     Element Should Exist    ${xml}    Header/Security/Timestamp
     Element Should Exist    ${xml}    Header/Security/UsernameToken
+
+Digest No Password
+    Run Keyword And Expect Error    Password is required when digest is True.    Apply Username Token    user    digest=True
+
+Digest No Nonce Or Created
+    Apply Username Token    user    password    digest=True
+    Call Soap Method    theAnswer
+    ${digest}=    Get Password
+    Should Be Equal As Strings    ${digest}    W6ph5Mm5Pz8GgiULbPgzG37mj9g=
+
+Digest
+    Apply Username Token    user    password    True    True    digest=True
+    Set Fixed Nonce    5ABcqPZWb6ImI2E6tob8MQ==
+    Set Fixed Created    2010-06-08T07:26:50Z
+    Call Soap Method    theAnswer
+    ${digest}=    Get Password
+    Should Be Equal As Strings    ${digest}    CBb7a2itQDgxVkqYnFtggUxtuqk=
+    ${created}=    Get Created In UsernameToken
+    Should Be Equal As Strings    ${created}    2010-06-08T07:26:50Z
+    ${nonce}=    Get Nonce
+    Should Be Equal As Strings    ${nonce}    5ABcqPZWb6ImI2E6tob8MQ==
 
 *** Keywords ***
 Created Should Be Absent
@@ -118,6 +144,11 @@ Get Created and Expires
 Get Nonce
     ${xml}=    Get Last Sent
     ${nonce}=    Get Element Text    ${xml}    Header/Security/UsernameToken/Nonce
+    [Return]    ${nonce}
+
+Get Password
+    ${xml}=    Get Last Sent
+    ${nonce}=    Get Element Text    ${xml}    Header/Security/UsernameToken/Password
     [Return]    ${nonce}
 
 Nonce Should Be Absent
