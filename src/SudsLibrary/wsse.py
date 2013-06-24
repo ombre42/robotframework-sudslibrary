@@ -22,6 +22,7 @@ from suds.sax.date import UTC
 from random import random
 from hashlib import sha1
 import base64
+import re
 from datetime import timedelta
 import robot
 
@@ -47,14 +48,17 @@ class AutoTimestamp(Timestamp):
         self.created = Token.utc()
         root = Element("Timestamp", ns=WSUNS)
         created = Element('Created', ns=WSUNS)
-        created.setText(str(UTC(self.created)))
+        created.setText(self._trim_to_ms(str(UTC(self.created))))
         root.append(created)
         if self.validity is not None:
             self.expires = self.created + timedelta(seconds=self.validity)
             expires = Element('Expires', ns=WSUNS)
-            expires.setText(str(UTC(self.expires)))
+            expires.setText(self._trim_to_ms(str(UTC(self.expires))))
             root.append(expires)
         return root
+
+    def _trim_to_ms(self, datetime):
+        return re.sub(r'(?<=\.\d{3})\d+', '', datetime)
 
 
 class AutoUsernameToken(UsernameToken):

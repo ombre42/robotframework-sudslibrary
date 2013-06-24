@@ -34,6 +34,14 @@ Timestamp Without Expires
     ${xml}=    Get Last Sent
     Element Should Not Exist    ${xml}    Header/Security/Timestamp/Expires
 
+Timestamp Precise Only To Milliseconds
+    [Documentation]    Per Basic Security Profile 1.1's R3220 & R3221, datetime should only be precise to milliseconds.
+    Apply Security Timestamp    30 sec
+    Call Soap Method    theAnswer
+    ${created}    ${expires}=    Get Created and Expires
+    Should Not Match Regexp    ${created}    \\.\\d{4}
+    Should Not Match Regexp    ${expires}    \\.\\d{4}
+
 Username and Password
     Call Soap Method    theAnswer
     Username and Password Should Be Absent
