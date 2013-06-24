@@ -171,4 +171,5 @@ class _WsseKeywords(object):
         wsse = self._client().options.wsse
         if wsse is None and create:
             wsse = Security()
+            wsse.mustUnderstand = '1'
         return wsse

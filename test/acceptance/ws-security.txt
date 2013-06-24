@@ -134,6 +134,13 @@ Digest
     ${nonce}=    Get Nonce
     Should Be Equal As Strings    ${nonce}    5ABcqPZWb6ImI2E6tob8MQ==
 
+mustUnderstand value
+    [Documentation]    Suds uses "true" for mustUnderstand, which is appropriate for SOAP 1.2, but for 1.1 it should be "1" or "0".
+    Apply Security Timestamp
+    Call Soap Method    theAnswer
+    ${xml}=    Get Last Sent
+    Element Attribute Should Be    ${xml}    mustUnderstand    1    Header/Security
+
 *** Keywords ***
 Created Should Be Absent
     ${xml}=    Get Last Sent
