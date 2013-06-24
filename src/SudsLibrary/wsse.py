@@ -22,6 +22,7 @@ from suds.sax.date import UTC
 from random import random
 from hashlib import sha1
 import base64
+from datetime import timedelta
 import robot
 
 
@@ -38,12 +39,22 @@ WSUNS = \
 
 class AutoTimestamp(Timestamp):
 
-    def __init__(self, validity=90):
+    def __init__(self, validity=None):
         Token.__init__(self)
         self.validity = validity
 
     def xml(self):
-        return Timestamp(self.validity).xml()
+        self.created = Token.utc()
+        root = Element("Timestamp", ns=WSUNS)
+        created = Element('Created', ns=WSUNS)
+        created.setText(str(UTC(self.created)))
+        root.append(created)
+        if self.validity is not None:
+            self.expires = self.created + timedelta(seconds=self.validity)
+            expires = Element('Expires', ns=WSUNS)
+            expires.setText(str(UTC(self.expires)))
+            root.append(expires)
+        return root
 
 
 class AutoUsernameToken(UsernameToken):
@@ -104,12 +115,13 @@ class AutoUsernameToken(UsernameToken):
 
 class _WsseKeywords(object):
 
-    def apply_security_timestamp(self, duration='90 seconds'):
+    def apply_security_timestamp(self, duration=None):
         """Applies a Timestamp element to future requests valid for the given `duration`.
 
         The SOAP header will contain a Timestamp element as specified in the
         WS-Security extension. The Created and Expires values are updated
-        every time a request is made.
+        every time a request is made. If `duration` is None, the Expires
+        element will be absent.
 
         `duration` must be given in Robot Framework's time format (e.g.
         '1 minute', '2 min 3 s', '4.5').
@@ -117,10 +129,11 @@ class _WsseKeywords(object):
         Example:
         | Apply Security Timestamp | 5 min |
         """
-        validity = robot.utils.timestr_to_secs(duration)
+        if duration is not None:
+            duration = robot.utils.timestr_to_secs(duration)
         wsse = self._get_wsse()
         wsse.tokens = [x for x in wsse.tokens if not isinstance(x, Timestamp)]
-        wsse.tokens.insert(0, AutoTimestamp(validity))
+        wsse.tokens.insert(0, AutoTimestamp(duration))
         self._client().set_options(wsse=wsse)
 
     def apply_username_token(self, username, password=None, setcreated=False,

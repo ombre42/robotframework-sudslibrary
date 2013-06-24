@@ -28,10 +28,11 @@ Replace Existing Timestamp
     Timestamp Duration Should Be    10
     Should Be Equal    ${sudslib._client().options.wsse}    ${security}
 
-Default Timestamp Duration
+Timestamp Without Expires
     Apply Security Timestamp
     Call Soap Method    theAnswer
-    Timestamp Duration Should Be    90
+    ${xml}=    Get Last Sent
+    Element Should Not Exist    ${xml}    Header/Security/Timestamp/Expires
 
 Username and Password
     Call Soap Method    theAnswer
@@ -162,7 +163,7 @@ Nonce Should Be Present
 
 Password Should Be Absent
     ${xml}=    Get Last Sent
-    ${first nonce}=    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Password
+    Element Should Not Exist    ${xml}    Header/Security/UsernameToken/Password
 
 Timestamp Duration Should Be
     [Arguments]    ${difference}
