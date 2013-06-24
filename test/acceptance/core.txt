@@ -320,6 +320,12 @@ Timeout Set On Create
     ${sl}=    Get Library Instance    SudsLibrary
     Should Be Equal As Numbers    ${sl._client().options.timeout}    45
 
+Raw Soap Message
+    ${message}=    Create Raw Soap Message    <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns0="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="urn:TestService" xmlns:ns2="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns3="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header/><ns2:Body><ns1:complexTypeArgument><person xsi:type="ns1:Person"><first-name xsi:type="ns3:string">Phillip</first-name><last-name xsi:type="ns3:string">McCann</last-name></person></ns1:complexTypeArgument></ns2:Body></SOAP-ENV:Envelope>
+    Create Soap Client    ${TEST WSDL URL}
+    ${response}=    Call Soap Method    complexTypeArgument    ${message}
+    Should Be Equal As Strings    ${response}    Phillip McCann
+
 *** Keywords ***
 Default Socket Timeout Should Be
     [Arguments]    ${timeout}

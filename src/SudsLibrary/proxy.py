@@ -13,8 +13,13 @@
 # limitations under the License.
 
 from suds import WebFault
+from suds.sax.text import Raw
 from .utils import *
 import socket
+
+
+class RawSoapMessage(str):
+    pass
 
 
 class _ProxyKeywords(object):
@@ -58,6 +63,19 @@ class _ProxyKeywords(object):
         """
         return self._call(None, None, True, name, *args)
 
+    def create_raw_soap_message(self, message):
+        """Returns an object that can used in lieu of SOAP method arguments.
+
+        `message` should be an entire SOAP message as a string. The object
+        returned can be used in lieu of *args for `Call Soap Method`, `Call
+        Soap Method Expecting Fault`, and `Specific Soap Call`.
+
+        Example:\n
+        | ${message}=      | Create Raw Soap Message | <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns0="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="urn:TestService" xmlns:ns2="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns3="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header/><ns2:Body><ns1:complexTypeArgument><person xsi:type="ns1:Person"><first-name xsi:type="ns3:string">Phillip</first-name><last-name xsi:type="ns3:string">McCann</last-name></person></ns1:complexTypeArgument></ns2:Body></SOAP-ENV:Envelope> |
+        | Call Soap Method | addContact              | ${message} |
+        """
+        return RawSoapMessage(message)
+
     # private
 
     def _call(self, service, port, expect_fault, name, *args):
@@ -71,7 +89,10 @@ class _ProxyKeywords(object):
         retxml = client.options.retxml
         received = None
         try:
-            received = method(*args)
+            if len(args) == 1 and isinstance(args[0], RawSoapMessage):
+                received = method(__inject={'msg': args[0]})
+            else:
+                received = method(*args)
             # client does not raise fault when retxml=True, this will cause it to be raised
             if retxml:
                 binding = method.method.binding.input
