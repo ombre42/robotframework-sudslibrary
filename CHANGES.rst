@@ -10,6 +10,7 @@ Release Notes
 - Support sending a raw SOAP message
 - Removed extra messages logged in keywords with Boolean arguments
 - Improved documentation
+- Clarified license
 
 New Keywords:
-Apply Username Token, Apply Security Timestamp, Create Raw Soap Message
+Apply Username Token, Apply Security Timestamp, Create Raw Soap Message, Set Soap Timeout
