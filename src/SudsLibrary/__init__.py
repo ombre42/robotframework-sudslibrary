@@ -47,9 +47,8 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
     If necessary, use keywords `Bind Schema To Location` or `Add Doctor
     Import`. These are rarely needed. Next, `Create Soap Client` to create a Suds
     client. The output from this keyword contains useful information including
-    available types and methods. Next, the options keywords may then be used to
-    configure the client if necessary. They all start with "Set". `Set
-    Location` is the most commonly needed keyword.
+    available types and methods. Next, use other keywords to configure the
+    client as necessary. `Set Location` is the most commonly needed keyword.
 
     == Working with WSDL Objects ==
     When Suds digests a WSDL, it creates dynamic types to represent the complex
@@ -85,8 +84,8 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
 
     == Example Test ==
     The following simple example demonstrates verifying the return value using
-    keywords in this library and in `BuiltIn` and `Collections` libraries. You
-    can run this test because it uses a public web service.
+    keywords in this library and in the `BuiltIn` and `Collections` libraries.
+    You can run this test because it uses a public web service.
 
     | Create Soap Client         | http://www.webservicex.net/Statistics.asmx?WSDL |               |              |
     | ${dbl array}=              | Create Wsdl Object                              | ArrayOfDouble |              |

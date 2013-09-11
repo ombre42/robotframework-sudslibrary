@@ -18,8 +18,19 @@ from .utils import *
 import socket
 
 
-class RawSoapMessage(str):
-    pass
+class RawSoapMessage(object):
+
+    def __init__(self, string):
+        if isinstance(string, unicode):
+            self.message = string.encode('UTF-8')
+        else:
+            self.message = str(string)
+
+    def __str__(self):
+        return self.message
+
+    def __unicode__(self):
+        return self.message.decode('UTF-8')
 
 
 class _ProxyKeywords(object):
@@ -71,8 +82,8 @@ class _ProxyKeywords(object):
         Soap Method Expecting Fault`, and `Specific Soap Call`.
 
         Example:\n
-        | ${message}=      | Create Raw Soap Message | <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns0="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="urn:TestService" xmlns:ns2="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns3="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><SOAP-ENV:Header/><ns2:Body><ns1:complexTypeArgument><person xsi:type="ns1:Person"><first-name xsi:type="ns3:string">Phillip</first-name><last-name xsi:type="ns3:string">McCann</last-name></person></ns1:complexTypeArgument></ns2:Body></SOAP-ENV:Envelope> |
-        | Call Soap Method | addContact              | ${message} |
+        | ${message}=      | Create Raw Soap Message | <SOAP-ENV:Envelope ...</ns2:Body></SOAP-ENV:Envelope> |
+        | Call Soap Method | addContact              | ${message}                                            |
         """
         return RawSoapMessage(message)
 
@@ -90,7 +101,7 @@ class _ProxyKeywords(object):
         received = None
         try:
             if len(args) == 1 and isinstance(args[0], RawSoapMessage):
-                received = method(__inject={'msg': args[0]})
+                received = method(__inject={'msg': args[0].message})
             else:
                 received = method(*args)
             # client does not raise fault when retxml=True, this will cause it to be raised
