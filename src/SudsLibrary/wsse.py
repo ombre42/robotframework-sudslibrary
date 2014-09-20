@@ -18,12 +18,11 @@ from suds.wsse import Token
 from suds.wsse import Timestamp
 from suds.wsse import UsernameToken
 from suds.sax.element import Element
-from suds.sax.date import UTC
 from random import random
 from hashlib import sha1
 import base64
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 import robot
 
 
@@ -38,6 +37,13 @@ WSUNS = \
      'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd')
 
 
+def iso_utc(dt=None):
+    if dt is None:
+        dt = datetime.utcnow()
+    # precision only to milliseconds per WS-Security recommendation
+    return re.sub(r'(?<=\.\d{3})\d+', '', dt.isoformat()) + 'Z'
+
+
 class AutoTimestamp(Timestamp):
 
     def __init__(self, validity=None):
@@ -45,20 +51,17 @@ class AutoTimestamp(Timestamp):
         self.validity = validity
 
     def xml(self):
-        self.created = Token.utc()
+        self.created = datetime.utcnow()
         root = Element("Timestamp", ns=WSUNS)
         created = Element('Created', ns=WSUNS)
-        created.setText(self._trim_to_ms(str(UTC(self.created))))
+        created.setText(iso_utc(self.created))
         root.append(created)
         if self.validity is not None:
             self.expires = self.created + timedelta(seconds=self.validity)
             expires = Element('Expires', ns=WSUNS)
-            expires.setText(self._trim_to_ms(str(UTC(self.expires))))
+            expires.setText(iso_utc(self.expires))
             root.append(expires)
         return root
-
-    def _trim_to_ms(self, datetime):
-        return re.sub(r'(?<=\.\d{3})\d+', '', datetime)
 
 
 class AutoUsernameToken(UsernameToken):
@@ -74,7 +77,7 @@ class AutoUsernameToken(UsernameToken):
         if text is None:
             hash = sha1()
             hash.update(str(random()))
-            hash.update(str(UTC()))
+            hash.update(iso_utc())
             self.nonce = hash.hexdigest()
         else:
             self.nonce = text
@@ -105,13 +108,13 @@ class AutoUsernameToken(UsernameToken):
             root.append(n)
         if self.created:
             c = Element('Created', ns=WSUNS)
-            c.setText(str(UTC(self.created)))
+            c.setText(iso_utc(self.created))
             root.append(c)
         return root
 
     def get_digest(self):
         nonce = str(self.nonce) if self.nonce else ""
-        created = str(UTC(self.created)) if self.created else ""
+        created = iso_utc(self.created) if self.created else ""
         password = str(self.password)
         message = nonce + created + password
         return base64.encodestring(sha1(message).digest())[:-1]
