@@ -8,6 +8,6 @@ MANIFEST
 doc/*.html
 test/results
 *.class
-
+.idea
 dist
 build
