@@ -25,3 +25,7 @@ class TestService(object):
     @ladonize(rtype=int)
     def theAnswer(self):
         return 42
+
+    @ladonize(PORTABLE_STRING, rtype=PORTABLE_STRING)
+    def fault(self, fault_string):
+        raise RuntimeError(fault_string)
