@@ -97,26 +97,23 @@ class _ProxyKeywords(object):
         if port or (port == 0):
             client.set_options(port=parse_index(port))
         method = getattr(client.service, name)
-        retxml = client.options.retxml
         received = None
         try:
             if len(args) == 1 and isinstance(args[0], RawSoapMessage):
                 received = method(__inject={'msg': args[0].message})
             else:
                 received = method(*args)
-            # client does not raise fault when retxml=True, this will cause it to be raised
-            if retxml:
-                binding = method.method.binding.input
-                binding.get_reply(method.method, received)
             if expect_fault:
                 raise AssertionError('The server did not raise a fault.')
         except WebFault, e:
             if not expect_fault:
                 raise e
-            if not retxml:
-                received = e.fault
+            received = e.fault
         finally:
             self._restore_options()
+        return_xml = self._get_external_option("return_xml", False)
+        if return_xml:
+            received = self.get_last_received()
         return received
 
     # private

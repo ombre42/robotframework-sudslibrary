@@ -26,6 +26,7 @@ from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
 import urllib2
 import traceback
+import weakref
 
 __version__ = VERSION
 
@@ -172,6 +173,7 @@ class SudsLibrary(_ClientManagementKeywords, _FactoryKeywords,
         self._imports = []
         self._logger = logger
         self._global_timeout = True
+        self._external_options = weakref.WeakKeyDictionary()
         try:
             part = urllib2.__version__.split('.', 1)
             n = float('.'.join(part))
