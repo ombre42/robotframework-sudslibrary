@@ -46,17 +46,25 @@ Set Return XML
     ${resp}    Call Soap Method    returnComplexType    John    Parsons
     Should Not Be Equal As Strings    ${resp}    ${JOHN PARSONS}
 
+Unexpected Fault
+    Create Soap Client    ${TEST WSDL URL}
+    Run Keyword And Expect Error    WebFault: Server raised fault: 'fault message'    Call Soap Method    fault    fault message
+
 Expecting Fault
     Create Soap Client    ${TEST WSDL URL}
-    ${fault}    Call Soap Method Expecting Fault    returnComplexType
-    Should Be Equal As Strings    ${fault.faultstring}    \ninterface name: soap11\nservice name: TestService\nParameter "first_name" is not optional
+    ${fault}    Call Soap Method Expecting Fault    fault    the sky is falling
+    Should Be Equal As Strings    ${fault.faultstring}    the sky is falling
+
+Expecting Fault But No Fault Occurs
+    Create Soap Client    ${TEST WSDL URL}
+    Run Keyword And Expect Error    The server did not raise a fault.    Call Soap Method Expecting Fault    theAnswer
 
 Expecting Fault w/ retxml
     Create Soap Client    ${TEST WSDL URL}
     Set Return Xml    true
-    ${resp}    Call Soap Method Expecting Fault    returnComplexType
+    ${resp}    Call Soap Method Expecting Fault    fault    oh no
     Should Start With    ${resp}    <?xml
-    Should Contain    ${resp}    <SOAP-ENV:Fault>
+    Element Text Should Be    ${resp}    oh no    Body/Fault/faultstring
 
 Complex Type Argument
     Create Soap Client    ${TEST WSDL URL}
