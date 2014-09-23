@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+0.9 (un-released)
+----------------
+- Restore compatability with suds-jurko
+
 0.8
 ----------------
 - Fixed installation dependency on ez_setup which was not included
