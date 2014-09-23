@@ -105,8 +105,11 @@ class _OptionsKeywords(object):
         Example:
         | ${old value}= | Set Return Xml | True |
         """
-        old_value = self._client().options.retxml
-        self._set_boolean_option('retxml', return_xml)
+        return_xml = to_bool(return_xml)
+        # not using the retxml option built into Suds because Suds does not raise exceptions when a SOAP fault occurs
+        # when retxml=True. Instead just use the XML that is already being captured with a plugin
+        old_value = self._get_external_option("return_xml", False)
+        self._set_external_option("return_xml", return_xml)
         return old_value
 
     def set_http_authentication(self, username, password, type='STANDARD'):
@@ -219,3 +222,17 @@ class _OptionsKeywords(object):
     def _set_soap_timeout(self, timeout):
         timeout_in_secs = robot.utils.timestr_to_secs(timeout)
         self._client().set_options(timeout=timeout_in_secs)
+
+    def _get_external_option(self, name, default):
+        value = default
+        if self._client() in self._external_options:
+            options = self._external_options[self._client()]
+            value = options.get(name, default)
+        return value
+
+    def _set_external_option(self, name, value):
+        if self._client() not in self._external_options:
+            self._external_options[self._client()] = {}
+        old_value = self._external_options[self._client()].get(name, None)
+        self._external_options[self._client()][name] = value
+        return old_value
