@@ -1,6 +1,4 @@
 *** Settings ***
-Suite Setup       Start Services
-Suite Teardown    Stop Services
 Test Setup        Create Soap Client    ${TEST WSDL URL}
 Resource          resource.txt
 
