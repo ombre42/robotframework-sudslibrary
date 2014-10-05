@@ -23,7 +23,8 @@ from .utils import *
 
 class _ClientManagementKeywords(object):
 
-    def create_soap_client(self, url_or_path, alias=None, autoblend=False, timeout='90 seconds'):
+    def create_soap_client(self, url_or_path, alias=None, autoblend=False, timeout='90 seconds', username=None,
+                           password=None, auth_type='STANDARD'):
         """Loads a WSDL from the given URL/path and creates a Suds SOAP client.
 
         Returns the index of this client instance which can be used later to
@@ -32,6 +33,10 @@ class _ClientManagementKeywords(object):
         Optional alias is an alias for the client instance and it can be used
         for switching between clients (just as index can be used). See `Switch
         Soap Client` for more details.
+
+        `username` and `password` are needed if the WSDL is on a server
+        requiring basic authentication. `auth_type` selects the authentication
+        scheme to use. See `Set Http Authentication` for more information.
 
         Autoblend ensures that the schema(s) defined within the WSDL import
         each other.
@@ -46,6 +51,10 @@ class _ClientManagementKeywords(object):
         url = self._get_url(url_or_path)
         autoblend = to_bool(autoblend)
         kwargs = {'autoblend': autoblend}
+        if username:
+            password = password if password is not None else ""
+            transport = self._get_transport(auth_type, username, password)
+            kwargs['transport'] = transport
         imports = self._imports
         if imports:
             self._log_imports()

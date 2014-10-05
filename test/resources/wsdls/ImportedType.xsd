@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema targetNamespace="http://tempuri.org/schemas" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+     <xsd:complexType name="Person">
+        <xsd:sequence>
+           <xsd:element maxOccurs="1" minOccurs="1" name="first-name" type="xsd:string"/>
+           <xsd:element maxOccurs="1" minOccurs="1" name="last-name" type="xsd:string"/>
+        </xsd:sequence>
+     </xsd:complexType>
+</xsd:schema>

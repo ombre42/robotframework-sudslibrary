@@ -119,19 +119,11 @@ class _OptionsKeywords(object):
         will only send credentials to the server upon request (HTTP/1.0 401
         Authorization Required) by the server only. Type ALWAYS_SEND will
         cause an Authorization header to be sent in every request. Type NTLM
-        requires the python-ntlm package to be installed, which is not
-        packaged with Suds or SudsLibrary.
+        is a Microsoft proprietary authentication scheme that requires the
+        python-ntlm package to be installed, which is not packaged with Suds
+        or SudsLibrary.
         """
-        classes = {
-            'STANDARD': HttpAuthenticated,
-            'ALWAYS_SEND': AlwaysSendTransport,
-            'NTLM': WindowsHttpAuthenticated
-        }
-        try:
-            _class = classes[type.upper()]
-        except KeyError:
-            raise ValueError("'%s' is not a supported type." % type)
-        transport = _class(username=username, password=password)
+        transport = self._get_transport(type, username=username, password=password)
         self._client().set_options(transport=transport)
 
     def set_location(self, url, service=None, names=None):
@@ -236,3 +228,16 @@ class _OptionsKeywords(object):
         old_value = self._external_options[self._client()].get(name, None)
         self._external_options[self._client()][name] = value
         return old_value
+
+    def _get_transport(self, auth_type, username, password):
+        classes = {
+            'STANDARD': HttpAuthenticated,
+            'ALWAYS_SEND': AlwaysSendTransport,
+            'NTLM': WindowsHttpAuthenticated
+        }
+        try:
+            _class = classes[auth_type.upper().strip()]
+        except KeyError:
+            raise ValueError("'%s' is not a supported authentication type." % auth_type)
+        transport = _class(username=username, password=password)
+        return transport
