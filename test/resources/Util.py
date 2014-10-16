@@ -5,6 +5,17 @@ from robot.libraries.BuiltIn import BuiltIn
 from SudsLibrary.wsse import AutoUsernameToken
 
 
+# dirty hack to disable Suds' caching, forcing Suds to fetch URLs every time
+from suds.cache import ObjectCache
+
+
+class CacheMonkeyPatches(object):
+    def get(self, id):
+        pass
+
+    ObjectCache.get = get
+
+
 class Util(object):
 
     def xml_datetime_difference(self, start, end=None):
@@ -15,7 +26,8 @@ class Util(object):
         else:
             end = self._trim_to_sec(end)
             end_dt = self._iso_to_datetime(end)
-        return (end_dt - start_dt).total_seconds()
+        td = end_dt - start_dt
+        return td.seconds + td.days * 24 * 3600
 
     def set_fixed_nonce(self, nonce):
         """`nonce` should be Base64 encoded."""

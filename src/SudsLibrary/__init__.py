@@ -13,14 +13,14 @@
 # limitations under the License.
 
 from robot.utils import ConnectionCache
-from .version import VERSION
-from .monkeypatches import *
-from .factory import _FactoryKeywords
-from .clientmanagement import _ClientManagementKeywords
-from .options import _OptionsKeywords
-from .proxy import _ProxyKeywords
-from .soaplogging import _SoapLoggingKeywords
-from .wsse import _WsseKeywords
+from version import VERSION
+from monkeypatches import *
+from factory import _FactoryKeywords
+from clientmanagement import _ClientManagementKeywords
+from options import _OptionsKeywords
+from proxy import _ProxyKeywords
+from soaplogging import _SoapLoggingKeywords
+from wsse import _WsseKeywords
 from suds import null
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn

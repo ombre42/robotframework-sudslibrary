@@ -14,7 +14,7 @@
 
 from suds import WebFault
 from suds.sax.text import Raw
-from .utils import *
+from utils import parse_index
 import socket
 
 

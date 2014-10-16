@@ -18,7 +18,7 @@ from suds.xsd.doctor import ImportDoctor
 from suds.transport.http import HttpAuthenticated
 from urlparse import urlparse
 from suds.client import Client
-from .utils import *
+from utils import to_bool
 
 
 class _ClientManagementKeywords(object):

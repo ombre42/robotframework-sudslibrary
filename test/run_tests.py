@@ -17,7 +17,7 @@ ROBOT_ARGS = [
 ]
 
 def acceptance_tests(args):
-    runner = 'pybot'
+    runner = args.pop(0)
     if os.sep == '\\':
         runner += '.bat'
     _make_results_dir()
@@ -38,4 +38,6 @@ def _make_results_dir():
 
 if __name__ ==  '__main__':
     args = sys.argv[1:]
+    if not args:
+        print "usage: run_tests.py pybot|jybot"
     acceptance_tests(args)

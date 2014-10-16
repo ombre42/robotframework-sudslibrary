@@ -113,7 +113,7 @@ Set Proxy
     Create Soap Client    ${TEST WSDL URL}
     Call Soap Method    theAnswer
     Set Proxies    http    localhost:9090
-    Run Keyword And Expect Error    URLError: <urlopen error [Errno 10061] No connection could be made because the target machine actively refused it>    Call Soap Method    theAnswer
+    Run Keyword And Expect Error    *10061*    Call Soap Method    theAnswer
 
 Return XML And Verify With XML Library
     Create Soap Client    ${TEST WSDL URL}
@@ -294,7 +294,7 @@ Soap Timeout
     [Documentation]    LOG 4 INFO SOAP timeout set to 30 seconds
     Create Soap Client    ${TEST WSDL URL}
     Set Soap Timeout    1 ms
-    Run Keyword And Expect Error    timeout: timed out    Call Soap Method    theAnswer
+    Run Keyword And Expect Error    *timed out*    Call Soap Method    theAnswer
     Set Soap Timeout    30s
     Call Soap Method    theAnswer
 

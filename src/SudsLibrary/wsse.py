@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .utils import *
+from utils import to_bool
 from suds.wsse import Security
 from suds.wsse import Token
 from suds.wsse import Timestamp

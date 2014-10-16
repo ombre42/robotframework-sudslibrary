@@ -18,7 +18,7 @@ from suds import ServiceNotFound
 from suds.transport.https import HttpAuthenticated
 from suds.transport.https import WindowsHttpAuthenticated
 from suds.transport.http import HttpAuthenticated as AlwaysSendTransport
-from .utils import *
+from utils import to_bool, parse_index, format_robot_time
 import robot
 
 

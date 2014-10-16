@@ -16,7 +16,7 @@ import xml.dom.minidom
 from xml.parsers.expat import ExpatError
 from suds.plugin import MessagePlugin
 from robot.api import logger
-from .utils import *
+from utils import to_bool
 
 
 class _SoapLogger(MessagePlugin):
