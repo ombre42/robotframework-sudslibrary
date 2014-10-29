@@ -2,6 +2,7 @@
 from ladon.ladonizer import ladonize
 from ladon.types.ladontype import LadonType
 from ladon.compat import PORTABLE_STRING
+import time
 
 class Person(LadonType):
 
@@ -29,3 +30,8 @@ class TestService(object):
     @ladonize(PORTABLE_STRING, rtype=PORTABLE_STRING)
     def fault(self, fault_string):
         raise RuntimeError(fault_string)
+
+    @ladonize(int, rtype=bool)
+    def slowOperation(self, delay=1):
+        time.sleep(delay)
+        return True

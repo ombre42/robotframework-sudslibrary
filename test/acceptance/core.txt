@@ -294,7 +294,7 @@ Soap Timeout
     [Documentation]    LOG 4 INFO SOAP timeout set to 30 seconds
     Create Soap Client    ${TEST WSDL URL}
     Set Soap Timeout    1 ms
-    Run Keyword And Expect Error    *timed out*    Call Soap Method    theAnswer
+    Run Keyword And Expect Error    *timed out*    Call Soap Method    slowOperation
     Set Soap Timeout    30s
     Call Soap Method    theAnswer
 
