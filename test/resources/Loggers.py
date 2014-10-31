@@ -5,15 +5,18 @@ import logging
 class HttpHandler(logging.Handler):
 
     def __init__(self):
+        self.request = None
         logging.Handler.__init__(self)
-        for module in ["suds.transport.http", "suds.transport.https"]:
+        for module in ["suds.transport.http", "suds.transport.https",
+                       "SudsLibrary.transport.http",
+                       "SudsLibrary.transport.https"]:
             logger = logging.getLogger(module)
             logger.setLevel(logging.DEBUG)
             logger.addHandler(self)
 
     def emit(self, record):
         try:
-            if record.msg=="sending:\n%s":
+            if record.msg == "sending:\n%s":
                 self.request = record.args[0]
         except:
             return

@@ -15,9 +15,17 @@
 from suds.xsd.doctor import Import
 from suds.xsd.sxbasic import Import as BasicImport
 from suds import ServiceNotFound
-from suds.transport.https import HttpAuthenticated
-from suds.transport.https import WindowsHttpAuthenticated
-from suds.transport.http import HttpAuthenticated as AlwaysSendTransport
+import sys
+if True:  # sys.platform.startswith('java') and sys.version_info < (2, 6):
+    from transport import HttpAuthenticated
+    from transport import WindowsHttpAuthenticated
+    from transport import AlwaysSendTransport
+    from transport import HttpTransport
+else:
+    from suds.transport.https import HttpAuthenticated
+    from suds.transport.https import WindowsHttpAuthenticated
+    from suds.transport.http import HttpAuthenticated as AlwaysSendTransport
+    from suds.transport.http import HttpTransport
 from utils import to_bool, parse_index, format_robot_time
 import robot
 
@@ -106,8 +114,9 @@ class _OptionsKeywords(object):
         | ${old value}= | Set Return Xml | True |
         """
         return_xml = to_bool(return_xml)
-        # not using the retxml option built into Suds because Suds does not raise exceptions when a SOAP fault occurs
-        # when retxml=True. Instead just use the XML that is already being captured with a plugin
+        # not using the retxml option built into Suds because Suds does not
+        # raise exceptions when a SOAP fault occurs when retxml=True. Instead
+        # just use the XML that is already being captured with a plugin
         old_value = self._get_external_option("return_xml", False)
         self._set_external_option("return_xml", return_xml)
         return old_value
@@ -123,7 +132,8 @@ class _OptionsKeywords(object):
         python-ntlm package to be installed, which is not packaged with Suds
         or SudsLibrary.
         """
-        transport = self._get_transport(type, username=username, password=password)
+        transport = self._get_transport(type, username=username,
+                                        password=password)
         self._client().set_options(transport=transport)
 
     def set_location(self, url, service=None, names=None):
@@ -141,7 +151,7 @@ class _OptionsKeywords(object):
         """
         wsdl = self._client().wsdl
         service_count = len(wsdl.services)
-        if (service_count == 1):
+        if service_count == 1:
             service = 0
         elif not service is None:
             service = parse_index(service)
@@ -238,6 +248,10 @@ class _OptionsKeywords(object):
         try:
             _class = classes[auth_type.upper().strip()]
         except KeyError:
-            raise ValueError("'%s' is not a supported authentication type." % auth_type)
+            raise ValueError("'%s' is not a supported authentication type." %
+                             auth_type)
         transport = _class(username=username, password=password)
         return transport
+
+    def _get_default_transport(self):
+        return HttpTransport()

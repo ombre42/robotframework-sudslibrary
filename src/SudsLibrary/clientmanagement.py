@@ -54,7 +54,9 @@ class _ClientManagementKeywords(object):
         if username:
             password = password if password is not None else ""
             transport = self._get_transport(auth_type, username, password)
-            kwargs['transport'] = transport
+        else:
+            transport = self._get_default_transport()
+        kwargs['transport'] = transport
         imports = self._imports
         if imports:
             self._log_imports()

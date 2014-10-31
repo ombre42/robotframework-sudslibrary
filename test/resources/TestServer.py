@@ -5,9 +5,7 @@ import wsgiref.simple_server
 from wsgiref.util import shift_path_info
 from os.path import abspath, dirname, join
 import os
-import sys
-import threading
-import time
+# from cherrypy import wsgiserver
 
 
 THIS_DIR = dirname(abspath(__file__))
@@ -68,8 +66,8 @@ class Caller(object):
         self._exit_func = exit_func
 
     def __call__(self, environ, start_response):
-        threading.Thread(target=self._exit_func).start()
-        start_response('200 OK', [('Content-Type', 'text/html'), ('Connection', 'close')])
+        self._exit_func()
+        start_response('200 OK', [('Content-type', 'text/plain')])
         return "OK"
 
 
@@ -86,10 +84,14 @@ class WebServer(object):
         secured = self._create_web_services('Secured services')
         secured = self._add_shared_data(secured)
         secured = Auth(secured)
-        application = Director(unsecured, secure=secured, exit=Caller(self.shutdown))
+        application = Director(unsecured, secure=secured,
+                               exit=Caller(self.shutdown))
         server = wsgiref.simple_server.make_server('', port, application)
         while not self._shutdown:
             server.handle_request()
+        #server = wsgiserver.CherryPyWSGIServer(('localhost', 8080),
+        # application)
+        #server.start()
 
     def _create_web_services(self, name):
         return LadonWSGIApplication(

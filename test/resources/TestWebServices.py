@@ -16,7 +16,8 @@ class TestWebServices(object):
         for i in range(10):
             try:
                 f = urllib.urlopen('http://localhost:8080/')
-                if f.read():
+                resp = f.read()
+                if "Ladon" in resp:  # getcode() not avail on 2.5
                     return
             except IOError, err:
                 print err.message
@@ -25,8 +26,3 @@ class TestWebServices(object):
 
     def stop_services(self):
         urllib.urlopen('http://localhost:8080/exit')
-        return
-        try:  # don't know why this fails randomly
-            urllib.urlopen('http://localhost:8080/exit')
-        except Exception, e:
-            print e

@@ -20,6 +20,7 @@ def acceptance_tests(args):
     runner = args.pop(0)
     if os.sep == '\\':
         runner += '.bat'
+    subprocess.call([runner, '--version'])
     _make_results_dir()
     cmd = [runner] + ROBOT_ARGS + args + [testenv.TEST_DATA]
     print "Executing:\n" + " ".join(cmd)
