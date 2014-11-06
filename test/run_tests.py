@@ -20,14 +20,20 @@ def acceptance_tests(args):
     runner = args.pop(0)
     if os.sep == '\\':
         runner += '.bat'
-    subprocess.call([runner, '--version'])
+    process = subprocess.Popen([runner, '--version'], stdout=subprocess.PIPE)
+    output, err = process.communicate()
+    exit_code = process.wait()
+    assert exit_code == 251
+    version_string = output.splitlines()[0]
     _make_results_dir()
-    cmd = [runner] + ROBOT_ARGS + args + [testenv.TEST_DATA]
+    cmd = [runner] + ROBOT_ARGS + ['--name', version_string] + args + [
+        testenv.TEST_DATA]
     print "Executing:\n" + " ".join(cmd)
     subprocess.call(cmd)
     outputxml = join(testenv.RESULTS_DIR, "output.xml")
     statuschecker.process_output(outputxml)
-    rc = robot.rebot(outputxml, outputdir=testenv.RESULTS_DIR)
+    rc = robot.rebot(outputxml, outputdir=testenv.RESULTS_DIR,
+                     report=version_string + '.html')
     if rc == 0:
         print 'All tests passed'
     else:
