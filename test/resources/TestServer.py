@@ -5,7 +5,9 @@ import wsgiref.simple_server
 from wsgiref.util import shift_path_info
 from os.path import abspath, dirname, join
 import os
-# from cherrypy import wsgiserver
+import sys
+import threading
+from cherrypy import wsgiserver
 
 
 THIS_DIR = dirname(abspath(__file__))
@@ -66,39 +68,35 @@ class Caller(object):
         self._exit_func = exit_func
 
     def __call__(self, environ, start_response):
-        self._exit_func()
+        thread = threading.Thread(target=self._exit_func)
+        thread.start()
         start_response('200 OK', [('Content-type', 'text/plain')])
-        return "OK"
+        return "Server shutting down..."
 
 
 class WebServer(object):
-    def __init__(self):
-        self._shutdown = False
 
     def shutdown(self):
-        self._shutdown = True
+        raise NotImplementedError
 
     def serve_forever(self):
+        raise NotImplementedError
+
+    def create_wsgi_app(self):
         unsecured = self._create_web_services('Unsecured services')
         unsecured = self._add_shared_data(unsecured)
         secured = self._create_web_services('Secured services')
         secured = self._add_shared_data(secured)
         secured = Auth(secured)
-        application = Director(unsecured, secure=secured,
-                               exit=Caller(self.shutdown))
-        server = wsgiref.simple_server.make_server('', port, application)
-        while not self._shutdown:
-            server.handle_request()
-        #server = wsgiserver.CherryPyWSGIServer(('localhost', 8080),
-        # application)
-        #server.start()
+        return Director(unsecured, secure=secured, exit=Caller(self.shutdown))
 
     def _create_web_services(self, name):
         return LadonWSGIApplication(
             service_modules,
             [join(THIS_DIR, 'services')],
             catalog_name=name,
-            catalog_desc='Ladon cannot cover many use cases for Suds, but it is easy to set up and generates WSDLs.')
+            catalog_desc='Ladon cannot cover all use cases for Suds, but it is'
+                         ' easy to set up and generates WSDLs.')
 
     def _add_shared_data(self, application):
         """Exposes the files in wsdls folder"""
@@ -106,7 +104,50 @@ class WebServer(object):
         return SharedDataMiddleware(application, mapping)
 
 
-if __name__ == '__main__':
+class CherryPyWebServer(WebServer):
+    def __init__(self):
+        self.server = None
+
+    def shutdown(self):
+        """Shutdown is not immediate. It will finish when all open sockets
+        close, e.g. due to timeout when using persistent sockets."""
+        self.server.stop()
+
+    def serve_forever(self):
+        application = self.create_wsgi_app()
+        self.server = wsgiserver.CherryPyWSGIServer(('localhost', port),
+                                                    application)
+        self.server.start()
+
+
+class WsgiRefWebServer(WebServer):
+    def __init__(self):
+        self._shutdown = False
+
+    def shutdown(self):
+        self._shutdown = True
+
+    def serve_forever(self):
+        application = self.create_wsgi_app()
+        server = wsgiref.simple_server.make_server('localhost', port,
+                                                   application)
+        while not self._shutdown:
+            server.handle_request()
+
+
+def main(*args):
+    servers = {
+        'CHERRYPY': CherryPyWebServer,
+        'WSGIREF': WsgiRefWebServer
+    }
+    server_type = 'CHERRYPY'
+    if args:
+        server_type = args[0]
+    server_type = server_type.upper().replace(' ', '')
+    try:
+        server = servers[server_type]()
+    except KeyError:
+        raise ValueError("%s is not a supported server type" % server_type)
     stuff = [
         ('Unsecured web services', 'http://localhost:%(port)s/'),
         ('Unsecured files', 'http://localhost:%(port)s/wsdls/'),
@@ -116,4 +157,10 @@ if __name__ == '__main__':
     ]
     for item in stuff:
         print item[0] + ' : ' + item[1] % {'port': port}
-    WebServer().serve_forever()
+    print "Starting the %s web server" % server_type
+    server.serve_forever()
+
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    main(*args)

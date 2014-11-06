@@ -16,7 +16,7 @@ from suds.xsd.doctor import Import
 from suds.xsd.sxbasic import Import as BasicImport
 from suds import ServiceNotFound
 import sys
-if True:  # sys.platform.startswith('java') and sys.version_info < (2, 6):
+if sys.platform.startswith('java') and sys.version_info < (2, 6):
     from transport import HttpAuthenticated
     from transport import WindowsHttpAuthenticated
     from transport import AlwaysSendTransport
